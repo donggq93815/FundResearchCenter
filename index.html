@@ -1,0 +1,490 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="基金智库工作台——面向客户经理的一站式公募基金展业工具原型">
+  <title>今日工作｜基金智库工作台</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="market.css">
+  <link rel="stylesheet" href="fund.css">
+  <link rel="stylesheet" href="portfolio.css">
+  <link rel="stylesheet" href="customer.css">
+  <link rel="stylesheet" href="companion.css">
+  <link rel="stylesheet" href="data_source_badge.css">
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-market" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 2 5-6"/><path d="M15 7h4v4"/></symbol>
+    <symbol id="i-fund" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/><path d="m3 7 6-4 6 7 6-5"/></symbol>
+    <symbol id="i-portfolio" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/><path d="M7 12h2l1.5-3 3 6 1.5-3h2"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3-1.4 3.6L7 8l3.6 1.4L12 13l1.4-3.6L17 8l-3.6-1.4L12 3ZM5 14l-.9 2.1L2 17l2.1.9L5 20l.9-2.1L8 17l-2.1-.9L5 14ZM18 13l-1.2 2.8L14 17l2.8 1.2L18 21l1.2-2.8L22 17l-2.8-1.2L18 13Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 22c4 0 7-3 7-7 0-3-1.5-5.5-4-8 .1 3-1 4-2 4-1.5 0-2-2-1-6-4 2-7 6-7 10 0 4 3 7 7 7Z"/><path d="M9 18c0-2 1-3 3-5 0 2 3 2 3 5a3 3 0 0 1-6 0Z"/></symbol>
+    <symbol id="i-trend-up" viewBox="0 0 24 24"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+    <symbol id="i-trend-down" viewBox="0 0 24 24"><path d="m3 7 6 6 4-4 8 8"/><path d="M15 17h6v-6"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.7 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 22V3M5 4h12l-2 4 2 4H5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path d="M8 9h8M8 13h5"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="i-pie" viewBox="0 0 24 24"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10Z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6L3.3 9.4l6-.9Z"/></symbol>
+    <symbol id="i-compare" viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="16" rx="1.5"/><path d="M6.5 15v-3M6.5 9V7M17.5 13v-3M17.5 17v-2"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m8.5 11.5 2.5 2.5 4.5-4.5"/></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div><div class="brand-name">基金智库</div><div class="brand-sub">交行客户经理工作台</div></div>
+      </div>
+      <div class="workspace-label">展业工作台</div>
+      <nav class="main-nav" aria-label="主导航">
+        <button class="nav-item active" data-nav="today"><svg><use href="#i-grid"/></svg><span>今日工作</span><span class="nav-count">8</span></button>
+        <button class="nav-item" data-nav="market"><svg><use href="#i-market"/></svg><span>看市场</span></button>
+        <button class="nav-item" data-nav="fund"><svg><use href="#i-fund"/></svg><span>配基金</span></button>
+        <button class="nav-item" data-nav="portfolio"><svg><use href="#i-portfolio"/></svg><span>建组合</span></button>
+        <button class="nav-item" data-nav="companion"><svg><use href="#i-heart"/></svg><span>陪持有</span></button>
+        <button class="nav-item" data-nav="customer"><svg><use href="#i-users"/></svg><span>找客户</span></button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="ai-nav-card">
+        <div class="ai-nav-icon"><svg><use href="#i-sparkles"/></svg></div>
+        <div class="ai-nav-title">AI 展业助手</div>
+        <p>解读市场变化，生成客户沟通草稿</p>
+        <button id="openAiBtn">开始对话<svg><use href="#i-arrow-right"/></svg></button>
+      </div>
+      <div class="sidebar-footer">
+        <div class="avatar">陈</div>
+        <div class="user-meta"><strong>陈明远</strong><span>上海徐汇支行 · 理财经理</span></div>
+        <svg class="muted-icon"><use href="#i-more"/></svg>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <button class="global-search" id="globalSearchBtn" aria-label="打开全局搜索">
+          <svg><use href="#i-search"/></svg><span>搜索客户、基金、组合或任务</span><kbd>Ctrl K</kbd>
+        </button>
+        <div class="topbar-right">
+          <span class="environment-badge"><span></span>演示环境</span>
+          <div class="notification-wrap">
+            <button class="icon-btn notification-btn" id="notificationBtn" aria-label="查看通知"><svg><use href="#i-bell"/></svg><span class="notification-dot"></span></button>
+            <div class="notification-panel" id="notificationPanel" hidden>
+              <div class="popover-head"><strong>通知</strong><span>3 条未读</span></div>
+              <button data-open-type="portfolio" data-open-id="P001"><span class="notice-icon warning"><svg><use href="#i-alert"/></svg></span><span><strong>组合风险提醒</strong><small>周先生组合触及内部提醒阈值</small></span></button>
+              <button data-open-type="fund" data-open-id="F001"><span class="notice-icon info"><svg><use href="#i-file"/></svg></span><span><strong>基金重要公告</strong><small>3 名持有客户需要关注</small></span></button>
+              <button data-open-type="task" data-open-id="T004"><span class="notice-icon neutral"><svg><use href="#i-clock"/></svg></span><span><strong>今日回访提醒</strong><small>李女士 · 今天 14:00</small></span></button>
+            </div>
+          </div>
+          <span class="topbar-divider"></span>
+          <div class="today-label"><svg><use href="#i-calendar"/></svg><span>2026年10月28日 · 星期三</span></div>
+        </div>
+      </header>
+
+      <main class="workspace" id="todayPage">
+        <section class="page-heading">
+          <div>
+            <div class="eyebrow">今日工作</div>
+            <h1>早上好，陈经理</h1>
+            <p>今天有 <strong id="headingTaskCount">8</strong> 项待办，其中 <strong class="text-danger">2 项</strong> 建议在晨会前优先关注。</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn btn-secondary" id="newTaskBtn"><svg><use href="#i-plus"/></svg>新建任务</button>
+            <button class="btn btn-primary" id="morningModeBtn"><svg><use href="#i-file"/></svg>进入晨会模式</button>
+          </div>
+        </section>
+
+        <div class="demo-notice"><svg><use href="#i-info"/></svg><span>本页面为产品原型，客户、基金、行情与资讯均为演示数据，仅用于展示产品流程，不构成投资建议。</span></div>
+
+        <section class="summary-grid" aria-label="今日工作摘要">
+          <button class="summary-card" data-summary-filter="all">
+            <span class="summary-icon blue"><svg><use href="#i-check-circle"/></svg></span>
+            <span class="summary-content"><span class="summary-label">今日必办</span><span class="summary-value" id="summaryAllCount">8<small>项</small></span><span class="summary-note">较昨日减少 3 项</span></span>
+            <svg class="summary-arrow"><use href="#i-chevron-right"/></svg>
+          </button>
+          <button class="summary-card" data-summary-filter="high">
+            <span class="summary-icon red"><svg><use href="#i-flag"/></svg></span>
+            <span class="summary-content"><span class="summary-label">晨会前优先</span><span class="summary-value" id="summaryHighCount">2<small>项</small></span><span class="summary-note danger">含 1 项组合风险提醒</span></span>
+            <svg class="summary-arrow"><use href="#i-chevron-right"/></svg>
+          </button>
+          <button class="summary-card" data-summary-filter="customer">
+            <span class="summary-icon teal"><svg><use href="#i-users"/></svg></span>
+            <span class="summary-content"><span class="summary-label">待跟进客户</span><span class="summary-value">5<small>位</small></span><span class="summary-note">2 位已有约定时间</span></span>
+            <svg class="summary-arrow"><use href="#i-chevron-right"/></svg>
+          </button>
+          <button class="summary-card" data-summary-filter="holding">
+            <span class="summary-icon amber"><svg><use href="#i-portfolio"/></svg></span>
+            <span class="summary-content"><span class="summary-label">组合与持仓提醒</span><span class="summary-value">3<small>项</small></span><span class="summary-note">均已匹配陪伴建议</span></span>
+            <svg class="summary-arrow"><use href="#i-chevron-right"/></svg>
+          </button>
+        </section>
+
+        <div class="content-grid">
+          <section class="card task-card" id="taskSection">
+            <div class="card-header task-card-header">
+              <div><div class="card-title-row"><h2>今日必办</h2><span class="count-badge" id="taskCountBadge">8</span></div><p>按业务优先级排序，先处理最重要的事</p></div>
+              <button class="text-btn" id="toggleAllTasks">查看全部<svg><use href="#i-arrow-right"/></svg></button>
+            </div>
+            <div class="task-tabs" role="tablist" aria-label="任务筛选">
+              <button class="active" data-task-filter="all">全部</button>
+              <button data-task-filter="customer">客户跟进</button>
+              <button data-task-filter="holding">持仓提醒</button>
+              <button data-task-filter="fund">基金事件</button>
+              <button data-task-filter="opportunity">展业线索</button>
+            </div>
+            <div class="task-list" id="taskList"></div>
+            <div class="task-list-footer"><span id="taskListSummary">显示 5 项，共 8 项待办</span><button class="text-btn" id="taskPreferenceBtn"><svg><use href="#i-sliders"/></svg>排序规则</button></div>
+          </section>
+
+          <div class="right-column">
+            <section class="card briefing-card">
+              <div class="card-header compact">
+                <div><div class="card-title-row"><span class="title-icon blue"><svg><use href="#i-file"/></svg></span><h2>晨会一页纸</h2></div><p>盘前版 · 2026/10/28</p></div>
+                <span class="status-badge success"><span></span>已生成</span>
+              </div>
+              <div class="briefing-theme"><span>今日主线</span><strong>结构性行情下，做好持仓解释与风险预期管理</strong></div>
+              <div class="briefing-points">
+                <button data-briefing-section="market"><span class="point-index">01</span><span><strong>市场概览</strong><small>隔夜海外表现分化，关注国内风险偏好的边际变化</small></span><svg><use href="#i-chevron-right"/></svg></button>
+                <button data-briefing-section="news"><span class="point-index">02</span><span><strong>重要事件</strong><small>梳理 3 条与基金持有体验相关的盘前要闻</small></span><svg><use href="#i-chevron-right"/></svg></button>
+                <button data-briefing-section="action"><span class="point-index">03</span><span><strong>展业提示</strong><small>优先陪伴波动敏感客户，不将热点等同于购买建议</small></span><svg><use href="#i-chevron-right"/></svg></button>
+              </div>
+              <div class="briefing-footer">
+                <span><svg><use href="#i-clock"/></svg>演示数据 · 08:45 更新</span>
+                <div><button class="icon-text-btn" id="copyBriefBtn" title="复制摘要"><svg><use href="#i-copy"/></svg></button><button class="btn btn-small btn-primary" id="viewBriefBtn">查看一页纸<svg><use href="#i-arrow-right"/></svg></button></div>
+              </div>
+            </section>
+
+            <section class="card hotspot-card">
+              <div class="card-header compact">
+                <div><div class="card-title-row"><span class="title-icon coral"><svg><use href="#i-flame"/></svg></span><h2>市场热点榜</h2></div><p>资讯热度与展业关联度综合排序</p></div>
+                <div class="mini-tabs"><button class="active" data-hotspot-filter="all">全市场</button><button data-hotspot-filter="related">与我相关</button></div>
+              </div>
+              <div class="hotspot-list" id="hotspotList"></div>
+              <div class="hotspot-footer"><span>热点不等于投资推荐</span><button class="text-btn" id="hotspotRuleBtn">排名规则<svg><use href="#i-info"/></svg></button></div>
+            </section>
+          </div>
+        </div>
+        <footer class="workspace-footer">基金智库工作台 · 内部展业辅助工具<span>数据访问与操作行为按内部合规要求留痕</span></footer>
+      </main>
+
+      <main class="workspace market-workspace" id="marketPage" hidden>
+        <section class="page-heading market-page-heading">
+          <div>
+            <div class="eyebrow">看市场 · 多资产温度</div>
+            <h1>市场温度与资产观点</h1>
+            <p>用同一套温度刻度观察国内权益、海外权益、债券、黄金与美元，再由 AI 解释资产状态。</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn btn-secondary" id="marketMethodBtn"><svg><use href="#i-sliders"/></svg>模型与指标口径</button>
+            <button class="btn btn-primary" id="marketMorningBtn"><svg><use href="#i-file"/></svg>生成晨会解读</button>
+          </div>
+        </section>
+
+        <div class="demo-notice"><svg><use href="#i-info"/></svg><span>本页为模型与交互原型，所有行情、指标、温度、走势和 AI 观点均为演示数据，不代表真实市场状态，不构成投资建议。</span></div>
+
+        <section class="market-hero-grid">
+          <div class="card composite-temp-card">
+            <div class="market-card-head"><div><span class="section-kicker">公司市场温度</span><h2>多资产综合温度</h2></div><span class="model-badge">模型演示 v1.0</span></div>
+            <div class="composite-main">
+              <div class="temperature-gauge" aria-label="综合市场温度 56 分">
+                <svg class="temp-gauge-svg" viewBox="0 0 260 155" role="img" aria-hidden="true">
+                  <path d="M40 130 A90 90 0 0 1 220 130" fill="none" stroke="#e8edf2" stroke-width="15" stroke-linecap="round"/>
+                  <path id="temperatureGaugeArc" d="M40 130 A90 90 0 0 1 220 130" fill="none" stroke="#d18a45" stroke-width="15" stroke-linecap="round" stroke-dasharray="158 283"/>
+                  <path d="M40 130 L40 137 M130 40 L130 47 M220 130 L220 137" fill="none" stroke="#a8b5c3" stroke-width="1.5"/>
+                </svg>
+                <div class="gauge-reading"><strong id="compositeTempValue">56</strong><span>/ 100</span><b id="compositeTempBand">中性</b></div>
+                <div class="gauge-ticks"><span>0 · 极冷</span><span>50</span><span>100 · 过热</span></div>
+              </div>
+              <div class="composite-context"><span class="context-label">温度结构</span><strong>风险资产略暖，防御资产分化</strong><p>国内权益与黄金拉高综合温度，债券和美元尚未形成同向确认。</p><div class="temperature-change"><span>较上一观察日</span><b>+2.0</b><small>温度变化，不是资产涨跌幅</small></div></div>
+            </div>
+            <div class="temperature-legend"><span><i class="cold"></i>0—19 极冷</span><span><i class="cool"></i>20—39 偏冷</span><span><i class="neutral"></i>40—59 中性</span><span><i class="warm"></i>60—79 偏热</span><span><i class="hot"></i>80—100 过热</span></div>
+            <div class="composite-foot"><span>五类资产标准化温度加权</span><span>权重：30% / 20% / 25% / 10% / 15%（演示）</span></div>
+          </div>
+
+          <div class="card market-summary-card">
+            <div class="market-card-head"><div><span class="section-kicker">AI 多资产总览</span><h2>当前更像结构性活跃</h2></div><span class="ai-badge"><svg><use href="#i-sparkles"/></svg>AI 推断</span></div>
+            <div class="summary-horizon"><span>观察期限：1—3 个月</span><span>置信度：中等</span><span>08:45 更新</span></div>
+            <p class="market-summary-text" id="marketSummaryText">综合温度处于中性区域，但资产内部差异明显。国内权益的温度与广度同步改善，黄金趋势温度较高；债券和美元未提供同向确认，因此暂不宜将当前状态解读为所有资产共同进入强趋势。</p>
+            <div class="market-signal-list">
+              <div><span class="signal-index">01</span><p><strong>主要支撑</strong>国内权益动量与广度改善，黄金趋势尚未被证伪。</p></div>
+              <div><span class="signal-index">02</span><p><strong>关键分歧</strong>利率方向不够清晰，海外权益仍受估值与利率双重约束。</p></div>
+              <div class="risk"><span class="signal-index">03</span><p><strong>反向风险</strong>若指数上行但广度回落，或实际利率快速反转，应重新评估当前观点。</p></div>
+            </div>
+            <div class="market-summary-actions"><span>观点失效条件已纳入 AI 判断</span><button class="text-btn" id="copyMarketSummaryBtn"><svg><use href="#i-copy"/></svg>复制综合解读</button></div>
+          </div>
+        </section>
+
+        <section class="asset-temperature-section">
+          <div class="market-section-heading"><div><h2>五类资产温度</h2><p>点击资产卡片，切换下方指标与 AI 观点</p></div><span>温度越高代表交易状态越热，不代表预期收益越高</span></div>
+          <div class="asset-card-grid" id="assetCards"></div>
+        </section>
+
+        <section class="asset-detail-grid">
+          <div class="card asset-data-panel">
+            <div class="asset-panel-head"><div><span class="section-kicker">资产数据看板</span><div class="asset-title-line"><h2 id="assetDetailName">国内权益</h2><span class="asset-detail-tag" id="assetDetailTag">偏热 64</span></div></div><div class="asset-data-time" id="assetDataTime">A 股上一交易日 · 演示数据</div></div>
+            <div class="asset-stat-strip" id="assetStatStrip"></div>
+            <div class="temperature-chart-block">
+              <div class="chart-head"><div><h3>资产温度走势</h3><span id="chartSubtitle">近 1 月 · 每日观察值（演示）</span></div><div class="chart-periods"><button data-chart-period="week">近 1 周</button><button class="active" data-chart-period="month">近 1 月</button><button data-chart-period="quarter">近 3 月</button></div></div>
+              <div class="temperature-chart" id="temperatureChart"></div>
+            </div>
+            <div class="indicator-block"><div class="chart-head"><div><h3>温度构成指标</h3><span>指标温度仅反映状态强弱与冷热</span></div><button class="text-btn" id="indicatorMethodBtn">查看口径<svg><use href="#i-info"/></svg></button></div><div class="indicator-table-wrap"><table class="indicator-table"><thead><tr><th>指标维度</th><th>当前观察值</th><th>指标温度</th><th>状态解读</th></tr></thead><tbody id="indicatorTableBody"></tbody></table></div></div>
+          </div>
+
+          <aside class="card ai-asset-panel" id="aiAssetPanel"></aside>
+        </section>
+
+        <section class="card cross-asset-card">
+          <div class="market-card-head"><div><span class="section-kicker">跨资产对照</span><h2>数据看板 + 文字解读</h2></div><button class="btn btn-secondary btn-small" id="copyAssetViewBtn"><svg><use href="#i-copy"/></svg>复制当前资产观点</button></div>
+          <div class="comparison-table-wrap"><table class="comparison-table"><thead><tr><th>资产类别</th><th>市场温度</th><th>温度变化</th><th>核心驱动</th><th>主要约束</th><th>AI 研究观点</th><th>观察期限</th></tr></thead><tbody id="comparisonTableBody"></tbody></table></div>
+          <div class="multi-asset-reading">
+            <div class="reading-column"><span>事实层</span><p id="readingFact">国内权益与黄金处于偏热区，海外权益、债券和美元处于中性区，五类资产并未同向升温。</p></div>
+            <div class="reading-column"><span>推断层</span><p id="readingInference">当前更接近结构性活跃，而非全面风险偏好上行。不同资产的利率敏感度与定价逻辑需要分别验证。</p></div>
+            <div class="reading-column"><span>展业层</span><p id="readingAction">客户经理可据此准备差异化持仓解释，不把温度排名直接转化为基金推荐或调仓指令。</p></div>
+          </div>
+          <div class="market-disclaimer"><svg><use href="#i-alert"/></svg><span>AI 观点基于演示指标与规则生成，实际接入时须保留数据来源、计算时点、模型版本和人工复核记录。温度不是择时信号，资产观点不构成收益承诺。</span></div>
+        </section>
+        <footer class="workspace-footer">看市场 · 公司温度模型与 AI 研究辅助<span>演示模型口径，正式权重需由投研、风控与合规共同确认</span></footer>
+      </main>
+
+      <main class="workspace fund-workspace" id="fundPage" hidden>
+        <section class="page-heading fund-page-heading">
+          <div>
+            <div class="eyebrow">配基金 · 全市场基金筛选</div>
+            <h1>三步定位候选基金</h1>
+            <p>策略类型 → 交行特色标签 → 行业概念，再用辅助条件收敛到可沟通的产品范围。</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn btn-secondary" id="fundPointsBtn"><svg><use href="#i-sliders"/></svg>标签判定口径</button>
+            <button class="btn btn-primary" id="fundAiBtn"><svg><use href="#i-sparkles"/></svg>AI 选基说明</button>
+          </div>
+        </section>
+
+        <div class="demo-notice"><svg><use href="#i-info"/></svg><span>本页为交互原型，基金、净值、业绩与标签均为演示数据；特色标签仅用于流程展示，不构成投资建议。</span></div>
+
+        <section class="card all-market-search" id="allMarketSearch">
+          <div class="ams-head">
+            <div><span class="section-kicker">全市场基金查询</span><h2>搜索全市场公募基金</h2><p>覆盖约 2 万只公募基金，按名称或代码搜索，查看真实净值与各期业绩（数据源：东方财富）。</p></div>
+            <span class="ams-count" id="amsCount">点击搜索加载</span>
+          </div>
+          <div class="ams-search-row">
+            <label class="search-field ams-input">${""}<svg><use href="#i-search"/></svg><input id="allFundInput" type="text" placeholder="输入基金名称或 6 位代码，如「易方达消费」或「110022」" autocomplete="off"></label>
+          </div>
+          <div class="ams-results" id="amsResults" hidden></div>
+        </section>
+
+        <div class="fund-layout">
+          <aside class="fund-filter card" id="fundFilter" aria-label="基金筛选条件"></aside>
+          <div class="fund-results">
+            <div class="fund-toolbar card" id="fundToolbar"></div>
+            <div id="fundResultArea"></div>
+          </div>
+        </div>
+
+        <footer class="fund-disclaimer">历史业绩不代表未来表现，投资有风险，选择需谨慎。页面数据为演示内容，正式使用须以监管及行内适当性管理要求为准。</footer>
+      </main>
+
+      <main class="workspace pf-workspace" id="portfolioPage" hidden>
+        <section class="page-heading">
+          <div>
+            <div class="eyebrow">建组合 · 配置参考方案</div>
+            <h1>画像定约束 · 市场定方向 · 模型定权重</h1>
+            <p>选择客户后按风险效用模型生成大类资产配置参考，并可完成持仓诊断、再平衡建议与沟通留痕。</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn btn-secondary" id="pfRuleBtn"><svg><use href="#i-sliders"/></svg>参数与计算依据</button>
+            <button class="btn btn-primary" id="pfSimEntryBtn"><svg><use href="#i-sparkles"/></svg>模拟客户演练</button>
+          </div>
+        </section>
+
+        <div class="demo-notice"><svg><use href="#i-info"/></svg><span>本页为配置引擎交互原型，客户、持仓、市场评分与基金池均为演示数据；方案为配置参考，不构成投资建议，正式使用须通过行内适当性与合规校验。</span></div>
+
+        <div class="pf-steps" id="pfSteps" aria-label="建组合流程步骤"></div>
+
+        <section class="card pf-section" id="pfCustomerSection">
+          <div class="card-header compact">
+            <div><div class="card-title-row"><h2>第一步 · 选择客户</h2><span class="count-badge" id="pfCustCount">6</span></div><p>支持姓名 / 客户号搜索；方案基于客户风险测评、投资期限与流动性需求生成</p></div>
+            <div class="pf-search"><svg><use href="#i-search"/></svg><input id="pfSearchInput" type="search" placeholder="搜索客户姓名或客户号" autocomplete="off"></div>
+          </div>
+          <div class="pf-customer-grid" id="pfCustomerGrid"></div>
+        </section>
+
+        <section class="card pf-section" id="pfProfileSection" hidden>
+          <div class="card-header compact"><div><div class="card-title-row"><h2>第二步 · 客户画像与约束</h2></div><p>λ 风险效用 → 配置中枢 → 硬约束叠加</p></div></div>
+          <div id="pfProfileBody"></div>
+        </section>
+
+        <section class="card pf-section" id="pfSchemeSection" hidden>
+          <div class="card-header compact"><div><div class="card-title-row"><h2>配置参考方案</h2></div><p>大类资产权重 + 优选池基金分配 + 市场状态依据</p></div></div>
+          <div id="pfSchemeBody"></div>
+        </section>
+
+        <section class="card pf-section" id="pfDiagSection" hidden>
+          <div class="card-header compact"><div><div class="card-title-row"><h2>第三步 · 持仓诊断与再平衡</h2></div><p>诊断评分 → 问题清单 → 调仓建议单（状态流转留痕）</p></div></div>
+          <div id="pfDiagBody"></div>
+        </section>
+
+        <footer class="workspace-footer">建组合 · 配置参考方案引擎<span>演示口径：λ 模型 P1.3 · 市场数据 2026-10-27 · 微调双人复核留痕 ≥ 5 年</span></footer>
+      </main>
+
+      <main class="workspace customer-workspace" id="customerPage" hidden>
+        <section class="page-heading">
+          <div>
+            <div class="eyebrow">找客户 · 商机与任务闭环</div>
+            <h1>今天该联系谁、为什么、聊什么</h1>
+            <p>商机识别 → 适当性校验 → 产品匹配 → 话术/材料 → 触达 → 记录 → 任务闭环 → 经营看板，全过程可解释、可复核、留痕。</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn btn-secondary" id="cltRuleBtn"><svg><use href="#i-sliders"/></svg>商机与匹配口径</button>
+            <button class="btn btn-primary" id="cltBoardBtn"><svg><use href="#i-pie"/></svg>查看经营看板</button>
+          </div>
+        </section>
+
+        <div class="demo-notice"><svg><use href="#i-info"/></svg><span>本页为交互原型：客户、商机、匹配与看板均为演示数据；商机分与匹配分按需求公式计算并可下钻复核，不构成投资建议，正式使用须通过行内适当性与合规校验。</span></div>
+
+        <div id="cltBody"></div>
+
+        <footer class="workspace-footer">找客户 · 商机雷达与任务闭环<span>演示口径：CLT-P1.0 · 数据时点 2026-10-28 · 频控：主动 ≤2 次/周 · 老年营销 ≤1 次/周 · 静默 20:00–9:00</span></footer>
+      </main>
+
+      <main class="workspace companion-workspace" id="companionPage" hidden>
+        <section class="page-heading">
+          <div>
+            <div class="eyebrow">陪持有 · 投资平行宇宙与全程监控</div>
+            <h1>陪客户走过持有期的每一天</h1>
+            <p>回顾客户基金投资全生命周期（投资总收益 = α 基金选择 + β 市场 + γ 客户行为），并对持有期进行全程监控，自动生成播报、异动、止盈/安抚与行为干预动作。</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn btn-secondary" id="cpRuleBtn"><svg><use href="#i-sliders"/></svg>规则与口径</button>
+            <button class="btn btn-primary" id="cpAiBtn"><svg><use href="#i-sparkles"/></svg>AI 监控摘要</button>
+          </div>
+        </section>
+
+        <div class="demo-notice"><svg><use href="#i-info"/></svg><span>本页为交互原型：客户、持仓、归因与事件均为演示数据；平行宇宙为假设性回测并显著标注，不构成收益预测或投资建议，正式使用须通过行内适当性与合规校验。</span></div>
+
+        <div id="cpBody"></div>
+
+        <footer class="workspace-footer">陪持有 · 投资平行宇宙与持有期全程监控<span>演示口径：HOLD-P1.0 · 数据时点 2026-10-28 · 频控：主动 ≤2 次/周 · 老年营销 ≤1 次/周 · 静默 20:00–9:00</span></footer>
+      </main>
+
+      <div class="clt-modal-overlay" id="cltModal" hidden>
+        <section class="clt-modal" role="dialog" aria-modal="true" aria-label="找客户操作弹窗">
+          <div id="cltModalContent"></div>
+        </section>
+      </div>
+
+      <div class="clt-modal-overlay" id="cpModal" hidden>
+        <section class="clt-modal" role="dialog" aria-modal="true" aria-label="陪持有操作弹窗">
+          <div id="cpModalContent"></div>
+        </section>
+      </div>
+
+      <div class="compare-tray" id="compareTray" hidden></div>
+    </div>
+  </div>
+
+  <div class="drawer-overlay" id="drawerOverlay" hidden>
+    <aside class="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <header class="drawer-header"><div><div class="drawer-eyebrow" id="drawerEyebrow">详情</div><h2 id="drawerTitle">详情</h2></div><button class="icon-btn" data-close-drawer aria-label="关闭详情"><svg><use href="#i-x"/></svg></button></header>
+      <div class="drawer-content" id="drawerContent"></div>
+    </aside>
+  </div>
+
+  <div class="modal-overlay" id="briefingModal" hidden>
+    <section class="modal briefing-modal" role="dialog" aria-modal="true" aria-labelledby="briefingModalTitle">
+      <header class="modal-header"><div><div class="eyebrow">基金智库 · 晨会材料</div><h2 id="briefingModalTitle">晨会一页纸</h2></div><div class="modal-actions"><button class="btn btn-secondary btn-small" id="printBriefBtn"><svg><use href="#i-print"/></svg>打印</button><button class="icon-btn" data-close-briefing aria-label="关闭晨会一页纸"><svg><use href="#i-x"/></svg></button></div></header>
+      <div class="briefing-document" id="briefingDocument">
+        <div class="document-heading"><div><span class="document-date">2026年10月28日 · 星期三</span><h3>结构性行情下，做好持仓解释与风险预期管理</h3></div><span class="document-tag">盘前版 · 演示</span></div>
+        <div class="document-demo">以下行情与资讯均为界面演示，不代表真实市场数据。</div>
+        <section class="document-section" id="briefSectionMarket"><h4><span>01</span>市场概览</h4><div class="market-snapshot"><div><span>沪深 300<small>上一交易日</small></span><strong class="up">+0.42%</strong></div><div><span>中证全债<small>上一交易日</small></span><strong class="down">-0.06%</strong></div><div><span>标普 500<small>隔夜</small></span><strong class="down">-0.18%</strong></div></div><p>不同市场的交易时段已分别标注。今日不宜仅依据单日涨跌判断趋势，晨会讨论重点放在不同资产对客户持有体验的影响。</p></section>
+        <section class="document-section" id="briefSectionNews"><h4><span>02</span>重要事件与解读</h4><ol class="document-news"><li><strong>防御与现金流质量话题热度上升</strong><p>红利低波相关内容受到关注，可向客户解释策略特征，但需同步提示风格轮动与回撤风险。</p></li><li><strong>债市波动引发固收产品持有体验关注</strong><p>对波动敏感客户优先说明产品久期、净值波动来源和持有期限，避免将短期波动简单等同于信用风险。</p></li><li><strong>科技成长板块成交活跃</strong><p>热点活跃度不等于持续性，涉及相关行业基金时应核对客户风险等级与实际持仓集中度。</p></li></ol></section>
+        <section class="document-section" id="briefSectionAction"><h4><span>03</span>今日展业提示</h4><div class="document-actions"><div><span>会前</span><p>优先检视周先生的组合风险提醒，并阅读交银稳健成长混合的演示公告。</p></div><div><span>会中</span><p>统一“解释变化—了解感受—核对需求—记录跟进”的陪伴沟通口径。</p></div><div><span>会后</span><p>按任务优先级完成客户回访，所有 AI 话术须经客户经理复核后使用。</p></div></div></section>
+        <section class="document-question"><strong>晨会讨论</strong><p>面对热点升温，我们如何将“产品推介”转化为“客户持仓解释与需求复核”？</p></section>
+        <div class="document-source">来源：基金智库演示数据｜数据时点：2026/10/28 08:45｜仅供内部展业流程演示</div>
+      </div>
+      <footer class="modal-footer"><span>事实、解读与展业提示已分区展示</span><button class="btn btn-primary" id="copyFullBriefBtn"><svg><use href="#i-copy"/></svg>复制晨会摘要</button></footer>
+    </section>
+  </div>
+
+  <div class="search-overlay" id="searchOverlay" hidden>
+    <section class="search-modal" role="dialog" aria-modal="true" aria-label="全局搜索">
+      <div class="search-input-wrap"><svg><use href="#i-search"/></svg><input id="searchInput" type="search" placeholder="搜索客户、基金、组合或任务" autocomplete="off"><kbd>ESC</kbd></div>
+      <div class="search-body"><div class="search-hint" id="searchHint">常用入口与最近访问</div><div class="search-results" id="searchResults"></div></div>
+      <footer class="search-footer"><span><kbd>↑</kbd><kbd>↓</kbd> 浏览结果</span><span><kbd>Enter</kbd> 打开详情</span><span>仅检索当前客户经理权限范围内的数据</span></footer>
+    </section>
+  </div>
+
+  <div class="modal-overlay" id="newTaskModal" hidden>
+    <section class="modal form-modal" role="dialog" aria-modal="true" aria-labelledby="newTaskTitle">
+      <header class="modal-header"><div><div class="eyebrow">今日工作</div><h2 id="newTaskTitle">新建任务</h2></div><button class="icon-btn" data-close-new-task aria-label="关闭新建任务"><svg><use href="#i-x"/></svg></button></header>
+      <form id="newTaskForm">
+        <div class="form-body">
+          <label class="form-field full"><span>任务标题 <b>*</b></span><input name="title" required maxlength="60" placeholder="例如：回访王女士，说明持仓基金公告"></label>
+          <div class="form-grid">
+            <label class="form-field"><span>任务类型</span><select name="type"><option value="customer">客户跟进</option><option value="holding">持仓提醒</option><option value="fund">基金事件</option><option value="opportunity">展业线索</option></select></label>
+            <label class="form-field"><span>优先级</span><select name="priority"><option value="normal">普通</option><option value="medium">重要</option><option value="high">紧急</option></select></label>
+            <label class="form-field"><span>截止时间</span><input name="due" type="time" value="16:00"></label>
+            <label class="form-field"><span>关联客户</span><select name="customer"><option value="">不关联客户</option><option value="C001">王女士</option><option value="C002">周先生</option><option value="C003">李女士</option><option value="C004">陈先生</option></select></label>
+          </div>
+          <label class="form-field full"><span>任务说明</span><textarea name="reason" rows="4" maxlength="200" placeholder="补充触发原因、沟通目标或注意事项"></textarea></label>
+          <div class="form-tip"><svg><use href="#i-info"/></svg>涉及客户沟通时，请先完成适当性与风险匹配复核。</div>
+        </div>
+        <footer class="modal-footer"><button type="button" class="btn btn-secondary" data-close-new-task>取消</button><button type="submit" class="btn btn-primary">创建任务</button></footer>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-overlay" id="pfSimModal" hidden>
+    <section class="modal pf-modal" role="dialog" aria-modal="true" aria-labelledby="pfSimTitle">
+      <header class="modal-header"><div><div class="eyebrow">FR-1.4 模拟客户</div><h2 id="pfSimTitle">模拟调整画像</h2></div><button class="icon-btn" id="pfSimClose" aria-label="关闭模拟画像"><svg><use href="#i-x"/></svg></button></header>
+      <div class="pf-modal-body">
+        <p class="pf-modal-tip">参数仅用于面谈演练与方案预沟通，模拟方案不得保存、导出或对客户展示。</p>
+        <label class="pf-sim-field"><span>风险等级（C1–C5）</span>
+          <select id="pfSimRisk"><option value="1">C1 保守型</option><option value="2">C2 稳健型</option><option value="3">C3 平衡型</option><option value="4">C4 成长型</option><option value="5">C5 进取型</option></select>
+        </label>
+        <label class="pf-sim-field"><span>年龄 <b id="pfSimAgeVal">48 岁</b></span><input type="range" id="pfSimAge" min="22" max="75" value="48"></label>
+        <label class="pf-sim-field"><span>投资期限 <b id="pfSimTermVal">24 个月</b></span><input type="range" id="pfSimTerm" min="3" max="120" step="3" value="24"></label>
+        <label class="pf-sim-field"><span>流动性需求 <b id="pfSimLiqVal">15%</b></span><input type="range" id="pfSimLiq" min="0" max="50" step="5" value="15"></label>
+        <div class="pf-sim-lambda"><span>λ 风险效用 <b id="pfSimLambda">—</b></span><span>对应类型 <b id="pfSimType">—</b></span></div>
+      </div>
+      <footer class="modal-footer"><button class="btn btn-secondary" id="pfSimCancel">取消</button><button class="btn btn-primary" id="pfSimApply">应用并重新生成</button></footer>
+    </section>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+  <script src="app.js" charset="utf-8"></script>
+  <script src="market.js" charset="utf-8"></script>
+  <script src="fund.js" charset="utf-8"></script>
+  <script src="portfolio.js" charset="utf-8"></script>
+  <script src="customer.js" charset="utf-8"></script>
+  <script src="companion.js" charset="utf-8"></script>
+  <script src="data_source_badge.js" charset="utf-8"></script>
+</body>
+</html>
