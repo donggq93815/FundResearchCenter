@@ -14,7 +14,14 @@
 (function () {
   "use strict";
 
-  var FUNDS_JSON = "data_service/output/funds.json";
+  // 数据源优先级：GitHub raw（缓存约 5 分钟，更新最快）→ jsDelivr CDN（加速兜底）→ 本地快照。
+  var DATA_RAW_BASE = "https://raw.githubusercontent.com/donggq93815/FundResearchCenter/main";
+  var DATA_CDN_BASE = "https://cdn.jsdelivr.net/gh/donggq93815/FundResearchCenter@main";
+  var FUNDS_JSON_CANDIDATES = [
+    DATA_RAW_BASE + "/data_service/output/funds.json",
+    DATA_CDN_BASE + "/data_service/output/funds.json",
+    "data_service/output/funds.json"
+  ];
   var state = {
     loaded: false,
     funds: [],
@@ -50,12 +57,18 @@
   }
 
   /* ---------- 加载 funds.json ---------- */
+  // 依次尝试候选 URL（GitHub 最新 → 本地兜底），任一成功即返回。
   function load() {
-    return fetch(FUNDS_JSON, { cache: "no-store" })
-      .then(function (r) {
-        if (!r.ok) throw new Error("http " + r.status);
-        return r.json();
-      })
+    function tryNext(urls) {
+      if (!urls.length) return Promise.reject(new Error("all sources failed"));
+      return fetch(urls[0], { cache: "no-store" })
+        .then(function (r) {
+          if (!r.ok) throw new Error("http " + r.status);
+          return r.json();
+        })
+        .catch(function () { return tryNext(urls.slice(1)); });
+    }
+    return tryNext(FUNDS_JSON_CANDIDATES)
       .then(function (j) {
         state.loaded = true;
         state.funds = j.funds || [];
@@ -162,7 +175,7 @@
   /* ---------- 数据源比对抽屉内容 ---------- */
   function sourceDrawerHTML() {
     if (!state.loaded) {
-      return '<div class="ds-empty">未检测到本地数据服务输出（data_service/output/funds.json）。<br>请先运行 <code>python data_service/run.py</code> 生成真实行情数据。</div>';
+      return '<div class="ds-empty">实时行情数据暂不可用（GitHub 最新数据与本地快照均未取到）。<br>请稍后刷新，或检查数据源是否已更新。</div>';
     }
     var html = "";
     html += '<div class="ds-drawer-head">';
