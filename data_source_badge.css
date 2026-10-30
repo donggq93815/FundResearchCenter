@@ -1,0 +1,309 @@
+/* -*- coding: utf-8 -*-
+ * 数据源交叉验证展示组件样式
+ */
+.ds-live-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px;
+  margin: 12px 0;
+  background: #f6f9fc;
+  border: 1px solid #e2eaf2;
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.ds-live-left {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ds-live-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #1f2d3d;
+}
+.ds-live-src,
+.ds-live-time {
+  font-size: 12px;
+  color: #7b8a9a;
+}
+.ds-live-indexes {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.ds-idx {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13px;
+}
+.ds-idx-name {
+  color: #4a5a6a;
+  white-space: nowrap;
+}
+.ds-idx-price {
+  font-weight: 700;
+  color: #1f2d3d;
+  font-variant-numeric: tabular-nums;
+}
+.ds-idx-pct {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.ds-up { color: #d54a3a; }
+.ds-down { color: #1f9d55; }
+.ds-flat { color: #7b8a9a; }
+
+/* 数据源状态抽屉 */
+.ds-drawer-head h2 { margin: 4px 0 6px; }
+.ds-drawer-head p { color: #5b6b7b; font-size: 13px; margin: 0 0 16px; line-height: 1.6; }
+
+.ds-source-strip {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.ds-src {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2eaf2;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2b3a4a;
+}
+.ds-src small { font-weight: 400; color: #7b8a9a; }
+.ds-src-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1f9d55;
+}
+.ds-src.down .ds-src-dot { background: #c0c8d0; }
+.ds-src.down { color: #8a97a5; }
+
+.ds-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  background: #fff8e6;
+  border: 1px solid #f0e2b6;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #8a6d1f;
+  line-height: 1.5;
+}
+.ds-note svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+
+.ds-fund-list { display: flex; flex-direction: column; gap: 14px; }
+.ds-fund-card {
+  border: 1px solid #e2eaf2;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
+}
+.ds-fund-card.conflict { border-color: #f0c4b8; background: #fffafa; }
+.ds-fund-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.ds-fund-title strong { font-size: 14px; color: #1f2d3d; }
+.ds-fund-title span { font-size: 12px; color: #8a97a5; margin-left: 8px; }
+.ds-fund-tag {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.ds-fund-tag.ok { background: #e8f6ee; color: #1f9d55; }
+.ds-fund-tag.conflict { background: #fdecea; color: #d54a3a; }
+
+.ds-adopt {
+  font-size: 13px;
+  color: #4a5a6a;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.ds-adopt b { color: #1f2d3d; }
+.ds-adopt small { color: #8a97a5; }
+
+.ds-compare {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.ds-compare th,
+.ds-compare td {
+  text-align: left;
+  padding: 7px 8px;
+  border-bottom: 1px solid #eef2f6;
+  font-variant-numeric: tabular-nums;
+}
+.ds-compare th {
+  background: #f6f9fc;
+  color: #5b6b7b;
+  font-weight: 600;
+}
+.ds-compare td:first-child { font-weight: 600; color: #2b3a4a; }
+
+.ds-conflict-note {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: #fdecea;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #b03a2a;
+  line-height: 1.6;
+}
+
+.ds-disclaimer {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 16px;
+  padding: 10px 12px;
+  background: #f6f9fc;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #7b8a9a;
+  line-height: 1.5;
+}
+.ds-disclaimer svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+
+.ds-empty {
+  padding: 24px;
+  text-align: center;
+  color: #8a97a5;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.ds-empty code {
+  background: #eef2f6;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+}
+
+/* 指数涨跌条形图 */
+.ds-live-wrap {
+  margin: 12px 0;
+  border: 1px solid #e2eaf2;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+.ds-live-wrap .ds-live-bar {
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid #eef2f6;
+  border-radius: 0;
+}
+.ds-idx-chart {
+  padding: 14px 16px 16px;
+}
+.ds-idx-chart-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.ds-idx-chart-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #1f2d3d;
+}
+.ds-idx-chart-sub {
+  font-size: 11px;
+  color: #8a97a5;
+}
+.ds-idx-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.ds-idx-row-name {
+  flex: 0 0 84px;
+  font-size: 12px;
+  color: #4a5a6a;
+  text-align: right;
+}
+.ds-idx-track {
+  flex: 1;
+  height: 16px;
+  background: #f0f3f6;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+}
+.ds-idx-fill {
+  height: 100%;
+  border-radius: 8px;
+  min-width: 3px;
+  transition: width .3s ease;
+}
+.ds-idx-fill.up { background: #d54a3a; }
+.ds-idx-fill.down { background: #1f9d55; }
+.ds-idx-row-val {
+  flex: 0 0 64px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 数据源管理面板 - 统计卡与元信息 */
+.ds-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.ds-stat {
+  padding: 12px 14px;
+  border: 1px solid #e2eaf2;
+  border-radius: 10px;
+  background: #f6f9fc;
+  text-align: center;
+}
+.ds-stat strong {
+  display: block;
+  font-size: 22px;
+  color: #1f2d3d;
+  font-variant-numeric: tabular-nums;
+}
+.ds-stat span {
+  font-size: 11px;
+  color: #7b8a9a;
+}
+.ds-stat.ok strong { color: #1f9d55; }
+.ds-stat.conflict strong { color: #d54a3a; }
+
+.ds-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  background: #f0f4f8;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #5b6b7b;
+}
+.ds-meta .btn {
+  margin-left: auto;
+}
