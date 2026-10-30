@@ -48,12 +48,23 @@
   const ageBuckets = { lt1: "小于 1 年", a1: "1—3 年", a3: "3—5 年", gt5: "大于 5 年" };
 
   /* ============================ 实时行情（三源交叉验证数据接入） ============================ */
-  // 读取 data_service/output/funds.json，按基金 code 匹配真实净值/涨跌幅。
-  // 数据不存在或加载失败时静默降级，不影响演示原型。
+  // 数据源优先级：GitHub raw（缓存约 5 分钟，更新最快）→ jsDelivr CDN（加速兜底）→ 本地发布快照。
+  // 每天 GitHub Actions 提交数据后，用户访问页面即自动拉到最新，无需人工重新发布。
+  const DATA_RAW_BASE = "https://raw.githubusercontent.com/donggq93815/FundResearchCenter/main";
+  const DATA_CDN_BASE = "https://cdn.jsdelivr.net/gh/donggq93815/FundResearchCenter@main";
+  // 依次尝试多个候选 URL，任一成功即返回；全部失败 reject。
+  function fetchFirstOk(urls, opts) {
+    if (!urls.length) return Promise.reject("no url");
+    return fetch(urls[0], opts).then(r => (r.ok ? r.json() : Promise.reject("http " + r.status)))
+      .catch(() => fetchFirstOk(urls.slice(1), opts));
+  }
   const liveData = { loaded: false, byCode: {}, generatedAt: "" };
   (function loadLiveData() {
-    fetch("data_service/output/funds.json", { cache: "no-store" })
-      .then(r => (r.ok ? r.json() : Promise.reject("http " + r.status)))
+    fetchFirstOk([
+      DATA_RAW_BASE + "/data_service/output/funds.json",
+      DATA_CDN_BASE + "/data_service/output/funds.json",
+      "data_service/output/funds.json"
+    ], { cache: "no-store" })
       .then(j => {
         liveData.loaded = true;
         liveData.generatedAt = j.generated_at || "";
@@ -87,7 +98,8 @@
   }
 
   /* ============================ 全市场基金查询 ============================ */
-  // 读取 data_service/output/all_funds.json（约 2 万只公募基金），支持按名称/代码搜索。
+  // 读取 all_funds.json（约 2 万只公募基金），支持按名称/代码搜索。
+  // 数据源优先级：GitHub 最新 → 本地发布快照兜底。
   // 懒加载：首屏不加载（7MB 文件慢），仅在用户聚焦搜索框时才加载。
   const allMarket = { loaded: false, loading: false, funds: [], total: 0 };
 
@@ -96,8 +108,11 @@
     allMarket.loading = true;
     const countEl = document.getElementById("amsCount");
     if (countEl) countEl.textContent = "加载中…";
-    fetch("data_service/output/all_funds.json", { cache: "no-store" })
-      .then(r => (r.ok ? r.json() : Promise.reject("http " + r.status)))
+    fetchFirstOk([
+      DATA_RAW_BASE + "/data_service/output/all_funds.json",
+      DATA_CDN_BASE + "/data_service/output/all_funds.json",
+      "data_service/output/all_funds.json"
+    ], { cache: "no-store" })
       .then(j => {
         allMarket.loaded = true;
         allMarket.loading = false;
@@ -111,7 +126,7 @@
       .catch(() => {
         allMarket.loaded = false;
         allMarket.loading = false;
-        if (countEl) countEl.textContent = "未加载（本地数据服务未运行）";
+        if (countEl) countEl.textContent = "未加载（数据源不可用）";
       });
   }
 
