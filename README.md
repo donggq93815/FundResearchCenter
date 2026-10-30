@@ -26,9 +26,17 @@ python data_service/run.py --all
 
 - `YINGMI_API_KEY`：盈米 API Key（可选，到 qieman.com/mcp 免费申请）。未配置时自动降级为双源（东财 + 蛋卷）。
 
-## 定时更新
+## 定时更新（全自动，无需人工发布）
 
-GitHub Actions 每个工作日（周一至周五）北京时间 20:30 自动运行 `data_service/run.py --all`，生成最新数据并提交回仓库（`.github/workflows/update-data.yml`）。
+GitHub Actions 每个工作日（周一至周五）北京时间 20:30 自动运行 `data_service/run.py --all`，生成最新数据并提交回仓库 main 分支（`.github/workflows/update-data.yml`）。
+
+前端页面的行情数据采用**三级自动降级加载**，用户每次访问都会自动拉到最新数据，无需人工重新发布：
+
+1. **GitHub raw**（`raw.githubusercontent.com`，缓存约 5 分钟）—— 更新最快，优先使用
+2. **jsDelivr CDN**（`cdn.jsdelivr.net/gh/...@main`）—— CDN 加速兜底
+3. **本地发布快照**（发布时打包的 JSON）—— 完全离线兜底
+
+> 说明：只要仓库保持**公开（public）**，前端即可直接读取 raw / jsDelivr 的最新数据。数据更新后约 5 分钟，所有访问者打开页面即看到最新行情。
 
 需在仓库 Settings → Secrets and variables → Actions 配置 `YINGMI_API_KEY`。
 
