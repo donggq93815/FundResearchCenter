@@ -101,6 +101,9 @@
 
     var left = el("div", "ds-live-left");
     left.appendChild(el("span", "ds-live-title", "实时行情"));
+    // 时点标识：盘中（交易时段实时价）/ 收盘（收盘价）
+    var quoteState = state.indexes.length ? (state.indexes[0].quote_time || "收盘") : "收盘";
+    left.appendChild(el("span", "ds-live-state " + (quoteState === "盘中" ? "trading" : "closed"), quoteState));
     left.appendChild(el("span", "ds-live-src", "数据源：新浪财经 / 东方财富"));
     left.appendChild(el("span", "ds-live-time", "更新 " + state.generated_at.slice(11)));
 
