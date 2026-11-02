@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-02 02:53:20",
+  "generated_at": "2026-11-02 13:50:06",
   "funds": [
     {
       "code": "519300",
@@ -778,64 +778,85 @@
       "source": "新浪财经",
       "code": "000001",
       "name": "上证指数",
-      "price": 3608.2821,
-      "change": 9.2655,
-      "pct": 0.26,
-      "volume": 3035304.0
+      "price": 3647.1502,
+      "change": 48.1336,
+      "pct": 1.34,
+      "volume": 4495781.0,
+      "is_close": false,
+      "quote_time": "盘中",
+      "fetched_at": "2026-11-02 13:50:06"
     },
     {
       "source": "新浪财经",
       "code": "399001",
       "name": "深证成指",
-      "price": 10902.47,
-      "change": 68.683,
-      "pct": 0.63,
-      "volume": 329314896.0
+      "price": 11087.92,
+      "change": 254.131,
+      "pct": 2.35,
+      "volume": 504818692.0,
+      "is_close": false,
+      "quote_time": "盘中",
+      "fetched_at": "2026-11-02 13:50:06"
     },
     {
       "source": "新浪财经",
       "code": "399006",
       "name": "创业板指",
-      "price": 2428.89,
-      "change": 15.26,
-      "pct": 0.63,
-      "volume": 19135016.0
+      "price": 2486.43,
+      "change": 72.798,
+      "pct": 3.02,
+      "volume": 30455533.0,
+      "is_close": false,
+      "quote_time": "盘中",
+      "fetched_at": "2026-11-02 13:50:06"
     },
     {
       "source": "新浪财经",
       "code": "000300",
       "name": "沪深300",
-      "price": 3998.4411,
-      "change": 12.9401,
-      "pct": 0.32,
-      "volume": 1292650.0
+      "price": 4030.8872,
+      "change": 45.3862,
+      "pct": 1.14,
+      "volume": 1906614.0,
+      "is_close": false,
+      "quote_time": "盘中",
+      "fetched_at": "2026-11-02 13:50:06"
     },
     {
       "source": "新浪财经",
       "code": "000905",
       "name": "中证500",
-      "price": 6319.8553,
-      "change": 53.6683,
-      "pct": 0.86,
-      "volume": 951227.0
+      "price": 6466.8125,
+      "change": 200.6255,
+      "pct": 3.2,
+      "volume": 1458500.0,
+      "is_close": false,
+      "quote_time": "盘中",
+      "fetched_at": "2026-11-02 13:50:06"
     },
     {
       "source": "新浪财经",
       "code": "000016",
       "name": "上证50",
-      "price": 2747.1199,
-      "change": 5.0091,
-      "pct": 0.18,
-      "volume": 308030.0
+      "price": 2760.7069,
+      "change": 18.5961,
+      "pct": 0.68,
+      "volume": 456370.0,
+      "is_close": false,
+      "quote_time": "盘中",
+      "fetched_at": "2026-11-02 13:50:06"
     },
     {
       "source": "新浪财经",
       "code": "000688",
       "name": "科创50",
-      "price": 1168.7244,
-      "change": 7.886,
-      "pct": 0.68,
-      "volume": 56941.0
+      "price": 1204.9036,
+      "change": 44.0652,
+      "pct": 3.8,
+      "volume": 85842.0,
+      "is_close": false,
+      "quote_time": "盘中",
+      "fetched_at": "2026-11-02 13:50:06"
     }
   ],
   "meta": {
