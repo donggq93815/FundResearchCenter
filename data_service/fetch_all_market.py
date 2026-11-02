@@ -28,12 +28,17 @@ import config
 
 RANK_URL = "http://fund.eastmoney.com/data/rankhandler.aspx"
 
+from classify_utils import classify_name, classify_type
+
 # 基金类型代码 -> 类型名
 TYPE_MAP = {
     "1": "股票型", "2": "债券型", "3": "混合型", "4": "货币型",
     "5": "指数型", "6": "QDII", "7": "FOF", "8": "REITs",
     "9": "商品型", "10": "其他",
 }
+
+
+
 
 # 收益字段顺序（索引 6 起）
 RET_FIELDS = [
@@ -89,15 +94,20 @@ def parse_record(raw):
         rec[key] = _f(fields[idx]) if len(fields) > idx else None
     # 成立日期
     rec["est_date"] = fields[16].strip() if len(fields) > 16 else ""
-    # 类型
+    # 类型：rankhandler ft=all 时字段[17]不表达类型，改用名称关键词归类
     rec["type_code"] = fields[17].strip() if len(fields) > 17 else ""
-    rec["type"] = TYPE_MAP.get(rec["type_code"], rec["type_code"] or "其他")
+    rec["type"] = classify_type(rec["name"])
     # 规模（亿）：rankhandler 字段 24 可能为规模变动（带符号），负值置 None 避免误导
     raw_scale = _f(fields[24]) if len(fields) > 24 else None
     rec["scale"] = raw_scale if (raw_scale is not None and raw_scale >= 0) else None
     # 费率
     rec["fee_mgmt"] = fields[19].strip() if len(fields) > 19 else ""
     rec["fee_custody"] = fields[20].strip() if len(fields) > 20 else ""
+    # 名称关键词归类：公司 / 行业 / 主题（零额外请求）
+    company, industry, themes = classify_name(rec["name"])
+    rec["company"] = company
+    rec["industry"] = industry
+    rec["themes"] = themes
     return rec
 
 
