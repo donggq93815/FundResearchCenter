@@ -24,6 +24,22 @@
   font-size: 14px;
   color: #1f2d3d;
 }
+.ds-live-state {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.ds-live-state.trading {
+  color: #c0392b;
+  background: #fdecea;
+  border: 1px solid #f5c6c0;
+}
+.ds-live-state.closed {
+  color: #2f6a8e;
+  background: #eef6fb;
+  border: 1px solid #cfe3ef;
+}
 .ds-live-src,
 .ds-live-time {
   font-size: 12px;
