@@ -138,11 +138,30 @@ def fetch_fund_basic(code):
     }
 
 
+def _market_session():
+    """
+    判断当前是否为 A 股交易时段（用于区分盘中实时价 / 收盘价）。
+    交易时段：工作日 9:30-11:30、13:00-15:00。
+    返回 (is_trading, label)：
+      - 交易中   -> "盘中"
+      - 收盘后   -> "收盘"
+      - 非交易日 -> "收盘"
+    """
+    import datetime
+    now = datetime.datetime.now()
+    # 周末
+    if now.weekday() >= 5:
+        return False, "收盘"
+    hm = now.hour * 60 + now.minute
+    trading = (9 * 60 + 30 <= hm <= 11 * 60 + 30) or (13 * 60 <= hm <= 15 * 60)
+    return (trading, "盘中" if trading else "收盘")
+
+
 def fetch_index_spot(codes=None):
     """
     拉取指数行情。
     优先走新浪财经（纯 https 直连稳定），失败时回退东财 push2。
-    返回 [{code, name, price, pct, change, ...}, ...]
+    返回 [{code, name, price, pct, change, is_close, quote_time, ...}, ...]
     """
     # 1) 新浪财经（主用）
     sina = _fetch_index_sina()
@@ -181,6 +200,8 @@ def _fetch_index_sina():
             except (TypeError, ValueError):
                 return None
 
+        import datetime
+        is_trading, quote_time = _market_session()
         result.append({
             "source": "新浪财经",
             "code": std_code or sina_code,
@@ -189,6 +210,9 @@ def _fetch_index_sina():
             "change": _f(fields[2]),
             "pct": _f(fields[3]),
             "volume": _f(fields[4]) if len(fields) > 4 else None,
+            "is_close": not is_trading,
+            "quote_time": quote_time,
+            "fetched_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         })
     return result
 
@@ -213,6 +237,8 @@ def _fetch_index_eastmoney(codes=None):
         return []
     diff = (j.get("data") or {}).get("diff") or []
     result = []
+    import datetime
+    is_trading, quote_time = _market_session()
     for item in diff:
         result.append({
             "source": "东方财富",
@@ -222,6 +248,9 @@ def _fetch_index_eastmoney(codes=None):
             "pct": item.get("f3"),
             "change": item.get("f4"),
             "volume": item.get("f6"),
+            "is_close": not is_trading,
+            "quote_time": quote_time,
+            "fetched_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         })
     return result
 
