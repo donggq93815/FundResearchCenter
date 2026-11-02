@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-30 18:08:57",
+  "generated_at": "2026-11-02 02:53:20",
   "funds": [
     {
       "code": "519300",
@@ -9,8 +9,16 @@
       "nav_date": "2026-10-30",
       "pct": -1.31,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 9.94,
+            "盈米": 10.15
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -21,6 +29,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 0.989,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": -1.31,
+          "status": "ok",
+          "scale": 10.15
+        },
+        {
           "name": "蛋卷",
           "nav": 0.989,
           "acc_nav": null,
@@ -29,8 +46,7 @@
           "status": "ok",
           "scale": 9.94
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "011234",
@@ -52,6 +68,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 1.0514,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": 0.0,
+          "status": "ok",
+          "scale": 0.015141
+        },
+        {
           "name": "蛋卷",
           "nav": 1.0514,
           "acc_nav": null,
@@ -59,8 +84,7 @@
           "pct": 0.0,
           "status": "ok"
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "000083",
@@ -82,6 +106,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 4.297,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": 1.61,
+          "status": "ok",
+          "scale": 61.27
+        },
+        {
           "name": "蛋卷",
           "nav": 4.297,
           "acc_nav": null,
@@ -90,8 +123,7 @@
           "status": "ok",
           "scale": 61.27
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "005267",
@@ -101,8 +133,16 @@
       "nav_date": "2026-10-30",
       "pct": 0.04,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 21.9,
+            "盈米": 22.89
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -113,6 +153,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 2.1235,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": 0.04,
+          "status": "ok",
+          "scale": 22.89
+        },
+        {
           "name": "蛋卷",
           "nav": 2.1235,
           "acc_nav": null,
@@ -121,8 +170,7 @@
           "status": "ok",
           "scale": 21.9
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "007890",
@@ -144,6 +192,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 1.0498,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": 0.04,
+          "status": "ok",
+          "scale": 80.38
+        },
+        {
           "name": "蛋卷",
           "nav": 1.0498,
           "acc_nav": null,
@@ -152,8 +209,7 @@
           "status": "ok",
           "scale": 80.38
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "001717",
@@ -163,8 +219,16 @@
       "nav_date": "2026-10-30",
       "pct": -1.38,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 72.87,
+            "盈米": 87.74
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -175,6 +239,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 2.929,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": -1.38,
+          "status": "ok",
+          "scale": 87.74
+        },
+        {
           "name": "蛋卷",
           "nav": 2.929,
           "acc_nav": null,
@@ -183,8 +256,7 @@
           "status": "ok",
           "scale": 72.87
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "005827",
@@ -206,6 +278,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 1.3725,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": 0.68,
+          "status": "ok",
+          "scale": 189.33
+        },
+        {
           "name": "蛋卷",
           "nav": 1.3725,
           "acc_nav": null,
@@ -214,8 +295,7 @@
           "status": "ok",
           "scale": 189.33
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "004231",
@@ -225,8 +305,16 @@
       "nav_date": "2026-10-30",
       "pct": -0.61,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 3.9,
+            "盈米": 17.42
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -237,6 +325,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 2.0134,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": -0.61,
+          "status": "ok",
+          "scale": 17.42
+        },
+        {
           "name": "蛋卷",
           "nav": 2.0134,
           "acc_nav": null,
@@ -245,8 +342,7 @@
           "status": "ok",
           "scale": 3.9
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "217022",
@@ -256,8 +352,16 @@
       "nav_date": "2026-10-30",
       "pct": -0.11,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 123.3,
+            "盈米": 129.39
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -268,6 +372,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 1.8696,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": -0.11,
+          "status": "ok",
+          "scale": 129.39
+        },
+        {
           "name": "蛋卷",
           "nav": 1.8696,
           "acc_nav": null,
@@ -276,8 +389,7 @@
           "status": "ok",
           "scale": 123.3
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "110008",
@@ -287,8 +399,16 @@
       "nav_date": "2026-10-30",
       "pct": -0.62,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 193.83,
+            "盈米": 311.03
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -299,6 +419,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 1.4115,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": -0.62,
+          "status": "ok",
+          "scale": 311.03
+        },
+        {
           "name": "蛋卷",
           "nav": 1.4115,
           "acc_nav": null,
@@ -307,8 +436,7 @@
           "status": "ok",
           "scale": 193.83
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "000084",
@@ -318,8 +446,16 @@
       "nav_date": "2026-10-30",
       "pct": -0.02,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 15.54,
+            "盈米": 27.83
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -330,6 +466,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 1.2607,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": -0.02,
+          "status": "ok",
+          "scale": 27.83
+        },
+        {
           "name": "蛋卷",
           "nav": 1.2607,
           "acc_nav": null,
@@ -338,8 +483,7 @@
           "status": "ok",
           "scale": 15.54
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "519723",
@@ -349,8 +493,16 @@
       "nav_date": "2026-10-30",
       "pct": -0.12,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 4.75,
+            "盈米": 7.91
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -361,6 +513,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 1.0638,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": -0.12,
+          "status": "ok",
+          "scale": 7.91
+        },
+        {
           "name": "蛋卷",
           "nav": 1.0638,
           "acc_nav": null,
@@ -369,38 +530,54 @@
           "status": "ok",
           "scale": 4.75
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "000198",
-      "name": "",
-      "nav": 0.2197,
+      "name": "天弘余额宝",
+      "nav": 0.2178,
       "acc_nav": 0.805,
-      "nav_date": "2026-10-30",
+      "nav_date": "2026-11-01",
       "pct": 0.0,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "nav",
+          "values": {
+            "东方财富": 0.2178,
+            "盈米": 1.0,
+            "蛋卷": 0.2178
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
-          "nav": 0.2197,
+          "nav": 0.2178,
           "acc_nav": 0.805,
-          "nav_date": "2026-10-30",
+          "nav_date": "2026-11-01",
           "pct": 0.0,
           "status": "ok"
         },
         {
-          "name": "蛋卷",
-          "nav": 0.2197,
+          "name": "盈米",
+          "nav": 1.0,
           "acc_nav": null,
-          "nav_date": "2026-10-30",
+          "nav_date": "2026-11-01",
+          "pct": 0.0,
+          "status": "ok",
+          "scale": 6451.36
+        },
+        {
+          "name": "蛋卷",
+          "nav": 0.2178,
+          "acc_nav": null,
+          "nav_date": "2026-11-01",
           "pct": null,
           "status": "ok"
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "000948",
@@ -410,8 +587,16 @@
       "nav_date": "2026-10-30",
       "pct": 1.31,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 7.98,
+            "盈米": 13.29
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -422,6 +607,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 1.296,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": 1.31,
+          "status": "ok",
+          "scale": 13.29
+        },
+        {
           "name": "蛋卷",
           "nav": 1.296,
           "acc_nav": null,
@@ -430,8 +624,7 @@
           "status": "ok",
           "scale": 7.98
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "000217",
@@ -441,8 +634,16 @@
       "nav_date": "2026-10-30",
       "pct": -1.2,
       "adopted_source": "东方财富",
-      "conflict": false,
-      "conflicts": [],
+      "conflict": true,
+      "conflicts": [
+        {
+          "field": "scale",
+          "values": {
+            "蛋卷": 280.82,
+            "盈米": 414.05
+          }
+        }
+      ],
       "sources": [
         {
           "name": "东方财富",
@@ -453,6 +654,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 2.8708,
+          "acc_nav": null,
+          "nav_date": "2026-10-30",
+          "pct": -1.2,
+          "status": "ok",
+          "scale": 414.05
+        },
+        {
           "name": "蛋卷",
           "nav": 2.8708,
           "acc_nav": null,
@@ -461,8 +671,7 @@
           "status": "ok",
           "scale": 280.82
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "006291",
@@ -484,6 +693,15 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 1.5769,
+          "acc_nav": null,
+          "nav_date": "2026-10-28",
+          "pct": 0.78,
+          "status": "ok",
+          "scale": 6.71
+        },
+        {
           "name": "蛋卷",
           "nav": 1.5769,
           "acc_nav": null,
@@ -491,16 +709,15 @@
           "pct": 0.78,
           "status": "ok"
         }
-      ],
-      "_b_down": true
+      ]
     },
     {
       "code": "508056",
-      "name": "",
+      "name": "中金普洛斯REIT",
       "nav": 3.6649,
       "acc_nav": 4.0695,
       "nav_date": "2024-03-31",
-      "pct": -1.29,
+      "pct": 4.25,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -508,13 +725,22 @@
           "field": "nav",
           "values": {
             "东方财富": 3.6649,
+            "盈米": 3.6603,
             "蛋卷": 3.1146
+          }
+        },
+        {
+          "field": "pct",
+          "values": {
+            "盈米": 4.25,
+            "蛋卷": -1.29
           }
         },
         {
           "field": "nav_date",
           "values": {
             "东方财富": "2024-03-31",
+            "盈米": "2023-12-31",
             "蛋卷": "2026-06-30"
           }
         }
@@ -529,6 +755,14 @@
           "status": "ok"
         },
         {
+          "name": "盈米",
+          "nav": 3.6603,
+          "acc_nav": null,
+          "nav_date": "2023-12-31",
+          "pct": 4.25,
+          "status": "ok"
+        },
+        {
           "name": "蛋卷",
           "nav": 3.1146,
           "acc_nav": null,
@@ -536,8 +770,7 @@
           "pct": -1.29,
           "status": "ok"
         }
-      ],
-      "_b_down": true
+      ]
     }
   ],
   "indexes": [
@@ -545,64 +778,64 @@
       "source": "新浪财经",
       "code": "000001",
       "name": "上证指数",
-      "price": 3599.0166,
-      "change": -52.4171,
-      "pct": -1.44,
-      "volume": 4979739.0
+      "price": 3608.2821,
+      "change": 9.2655,
+      "pct": 0.26,
+      "volume": 3035304.0
     },
     {
       "source": "新浪财经",
       "code": "399001",
       "name": "深证成指",
-      "price": 10833.78,
-      "change": -304.414,
-      "pct": -2.73,
-      "volume": 608289134.0
+      "price": 10902.47,
+      "change": 68.683,
+      "pct": 0.63,
+      "volume": 329314896.0
     },
     {
       "source": "新浪财经",
       "code": "399006",
       "name": "创业板指",
-      "price": 2413.63,
-      "change": -103.959,
-      "pct": -4.13,
-      "volume": 31815317.0
+      "price": 2428.89,
+      "change": 15.26,
+      "pct": 0.63,
+      "volume": 19135016.0
     },
     {
       "source": "新浪财经",
       "code": "000300",
       "name": "沪深300",
-      "price": 3985.501,
-      "change": -56.3366,
-      "pct": -1.39,
-      "volume": 1920917.0
+      "price": 3998.4411,
+      "change": 12.9401,
+      "pct": 0.32,
+      "volume": 1292650.0
     },
     {
       "source": "新浪财经",
       "code": "000905",
       "name": "中证500",
-      "price": 6266.187,
-      "change": -187.5303,
-      "pct": -2.91,
-      "volume": 1572402.0
+      "price": 6319.8553,
+      "change": 53.6683,
+      "pct": 0.86,
+      "volume": 951227.0
     },
     {
       "source": "新浪财经",
       "code": "000016",
       "name": "上证50",
-      "price": 2742.1108,
-      "change": -20.6799,
-      "pct": -0.75,
-      "volume": 519556.0
+      "price": 2747.1199,
+      "change": 5.0091,
+      "pct": 0.18,
+      "volume": 308030.0
     },
     {
       "source": "新浪财经",
       "code": "000688",
       "name": "科创50",
-      "price": 1160.8384,
-      "change": -67.2523,
-      "pct": -5.48,
-      "volume": 86409.0
+      "price": 1168.7244,
+      "change": 7.886,
+      "pct": 0.68,
+      "volume": 56941.0
     }
   ],
   "meta": {
@@ -611,7 +844,7 @@
       "盈米(验证)",
       "蛋卷(兜底)"
     ],
-    "yingmi_enabled": false,
+    "yingmi_enabled": true,
     "note": "三源交叉验证：不一致时前端并排列出各源数据，不静默取值"
   }
 }
