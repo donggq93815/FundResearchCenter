@@ -119,9 +119,13 @@
         allMarket.funds = j.funds || [];
         allMarket.total = j.total || allMarket.funds.length;
         if (countEl) countEl.textContent = allMarket.total.toLocaleString() + " 只基金";
+        // 构建全市场归一化数据（供配基金筛选"全市场"范围使用）
+        buildAllMarketNormalized();
         // 数据加载完成后，若搜索框已有内容，自动重新渲染结果
         const inp = document.getElementById("allFundInput");
         if (inp && inp.value.trim()) amsRenderResults(inp.value);
+        // 若当前已是"全市场"范围，刷新筛选结果
+        if (state.dataScope === "all") { renderFilterPanel(); renderResults(); }
       })
       .catch(() => {
         allMarket.loaded = false;
@@ -201,10 +205,15 @@
         <div class="detail-facts">
           <div><span>累计净值</span><b>${f.acc_nav != null ? Number(f.acc_nav).toFixed(4) : "—"}</b></div>
           <div><span>基金类型</span><b>${f.type || "—"}</b></div>
+          <div><span>基金公司</span><b>${escapeHTML(f.company || "—")}</b></div>
           <div><span>基金规模</span><b>${f.scale != null ? Number(f.scale).toFixed(2) + " 亿" : "—"}</b></div>
           <div><span>管理费</span><b>${f.fee_mgmt || "—"}</b></div>
           <div><span>托管费</span><b>${f.fee_custody || "—"}</b></div>
         </div>
+        ${f.industry || (f.themes && f.themes.length) ? `<div class="detail-facts" style="margin-top:10px">
+          ${f.industry ? `<div><span>行业板块</span><b>${industryMap[f.industry] ? industryMap[f.industry].name : f.industry}</b></div>` : ""}
+          ${(f.themes && f.themes.length) ? `<div><span>主题概念</span><b>${f.themes.join("、")}</b></div>` : ""}
+        </div>` : ""}
       </section>
       <div class="risk-note" style="margin-top:18px">适当性提示：全市场基金数据来自免费公开接口，仅供原型演示与内部试用，可能存在时点差异；向客户展示前须核对行内产品库与适当性要求，不构成投资建议。</div>`;
   }
@@ -392,6 +401,73 @@
   const industryMap = Object.fromEntries(industries.map(item => [item.id, item]));
   const tagMap = Object.fromEntries(tagDefs.map(item => [item.id, item]));
 
+  /* ============================ 全市场数据归一化 ============================ */
+  // 把 all_funds.json 的全市场基金映射到配基金模块的字段结构，用于"全市场"数据范围筛选。
+  const AM_TYPE_TO_SUB = {
+    "股票型": "股票型", "混合型": "偏股混合型", "债券型": "纯债型", "指数型": "指数型",
+    "货币型": "货币基金", "QDII": "股票型QDII", "FOF": "股票FOF", "REITs": "REITs",
+    "商品型": "商品型", "其他": "偏股混合型",
+  };
+  const AM_SUB_TO_GROUP = {
+    "股票型": "equity", "偏股混合型": "equity", "平衡混合型": "equity", "指数型": "equity",
+    "纯债型": "fixed", "一级债基": "fixed", "二级债基": "fixed", "短债型": "fixed",
+    "偏债混合型": "fixedplus", "可转债型": "fixedplus",
+    "货币基金": "money",
+    "股票型QDII": "qdii", "债券型QDII": "qdii", "混合型QDII": "qdii",
+    "股票FOF": "fof", "债券FOF": "fof", "混合FOF": "fof",
+    "商品型": "alt", "REITs": "alt",
+  };
+  // 全市场归一化缓存：{ byId: {}, list: [] }
+  const amNormalized = { byId: {}, list: [] };
+
+  function amRiskOf(type, scale) {
+    // 按类型给一个近似风险等级（全市场数据无评级，供筛选/展示兜底）
+    if (type === "货币型") return "R1";
+    if (type === "债券型") return "R2";
+    if (type === "指数型" || type === "QDII" || type === "FOF") return "R3";
+    if (type === "REITs" || type === "商品型") return "R4";
+    return "R4"; // 股票型/混合型
+  }
+
+  function normalizeAllMarket(f) {
+    const sub = AM_TYPE_TO_SUB[f.type] || "偏股混合型";
+    const group = AM_SUB_TO_GROUP[sub] || "equity";
+    const estYear = f.est_date ? parseInt(f.est_date.slice(0, 4), 10) : null;
+    const feeMgmt = f.fee_mgmt ? parseFloat(String(f.fee_mgmt).replace("%", "")) : null;
+    return {
+      id: "AM" + f.code,
+      name: f.name,
+      code: f.code,
+      company: f.company || "—",
+      group,
+      sub,
+      tags: [],
+      industry: f.industry || null,
+      industryLevel: f.industry ? "normal" : null,
+      themes: (f.themes || []).map(t => ({ name: t, level: "normal" })),
+      risk: amRiskOf(f.type),
+      ret: { m1: f.m1, m3: f.m3, m6: f.m6, y1: f.y1, y3: f.y3 },
+      scale: f.scale != null ? f.scale : 0,
+      manager: "—",
+      managerYears: 0,
+      managerReturn: null,
+      drawdown: null,
+      sharpe: null,
+      volatility: null,
+      est: estYear || 0,
+      feeMgmt: feeMgmt != null ? feeMgmt : 0,
+      feeCustody: 0,
+      isAllMarket: true,
+      amRaw: f,
+    };
+  }
+
+  function buildAllMarketNormalized() {
+    // 把 allMarket.funds（全市场原始数据）归一化，供筛选使用
+    amNormalized.list = allMarket.funds.map(normalizeAllMarket);
+    amNormalized.byId = Object.fromEntries(amNormalized.list.map(f => [f.id, f]));
+  }
+
   /* ============================ 销售一页纸数据（演示） ============================ */
   const salesData = {
     F001: {
@@ -533,7 +609,8 @@
     view: "list",
     compare: [],
     watch: new Set(),
-    expanded: new Set(["equity"])
+    expanded: new Set(["equity"]),
+    dataScope: "curated"  // "curated" = 精选池(17只) | "all" = 全市场(2万只)
   };
 
   /* ============================ 工具函数 ============================ */
@@ -597,28 +674,37 @@
 
   const tagMatchCount = fund => (state.tags.size ? fund.tags.filter(tag => state.tags.has(tag)).length : fund.tags.length);
 
+  // 当前数据池：精选池 / 全市场
+  function activePool() {
+    return state.dataScope === "all" && amNormalized.list.length ? amNormalized.list : funds;
+  }
+  function activeFundMap() {
+    return state.dataScope === "all" && amNormalized.byId && Object.keys(amNormalized.byId).length ? amNormalized.byId : fundMap;
+  }
+
   function sorted(list) {
     const copy = [...list];
-    const byY1 = (a, b) => b.ret.y1 - a.ret.y1;
+    const byY1 = (a, b) => (b.ret?.y1 ?? -9) - (a.ret?.y1 ?? -9);
     switch (state.sort) {
       case "y1desc": return copy.sort(byY1);
-      case "m3desc": return copy.sort((a, b) => b.ret.m3 - a.ret.m3);
-      case "ddasc": return copy.sort((a, b) => Math.abs(a.drawdown) - Math.abs(b.drawdown));
+      case "m3desc": return copy.sort((a, b) => (b.ret?.m3 ?? -9) - (a.ret?.m3 ?? -9));
+      case "ddasc": return copy.sort((a, b) => Math.abs(a.drawdown ?? 0) - Math.abs(b.drawdown ?? 0));
       case "sharpedesc": return copy.sort((a, b) => (b.sharpe ?? -9) - (a.sharpe ?? -9));
-      case "scaledesc": return copy.sort((a, b) => b.scale - a.scale);
-      case "estdesc": return copy.sort((a, b) => b.est - a.est);
+      case "scaledesc": return copy.sort((a, b) => (b.scale ?? 0) - (a.scale ?? 0));
+      case "estdesc": return copy.sort((a, b) => (b.est ?? 0) - (a.est ?? 0));
       default: return copy.sort((a, b) => (tagMatchCount(b) - tagMatchCount(a)) || byY1(a, b));
     }
   }
 
-  const filtered = () => (state.subs.size ? sorted(funds.filter(matches)) : []);
+  const filtered = () => (state.subs.size ? sorted(activePool().filter(matches)) : []);
 
   /* ============================ 筛选面板 ============================ */
   function renderFilterPanel() {
     const panel = $("#fundFilter");
     if (!panel) return;
+    const pool = activePool();
     const catHTML = strategyGroups.map(group => {
-      const count = funds.filter(fund => group.subs.includes(fund.sub)).length;
+      const count = pool.filter(fund => group.subs.includes(fund.sub)).length;
       return `
         <div class="cat-item" data-cat="${group.id}">
           <div class="cat-row">
@@ -626,7 +712,7 @@
             <button class="cat-name" data-cat-toggle="${group.id}">${group.name}<span class="cat-count">${count}</span></button>
             <button class="cat-expand" data-cat-expand="${group.id}" aria-label="展开${group.name}">${icon("chevron-down")}</button>
           </div>
-          <div class="cat-chips">${group.subs.map(sub => `<button class="mini-chip" data-sub="${sub}">${sub}<small>${funds.filter(fund => fund.sub === sub).length}</small></button>`).join("")}</div>
+          <div class="cat-chips">${group.subs.map(sub => `<button class="mini-chip" data-sub="${sub}">${sub}<small>${pool.filter(fund => fund.sub === sub).length}</small></button>`).join("")}</div>
           <div class="cat-hint">${group.subs.join(" / ")}</div>
         </div>`;
     }).join("");
@@ -634,12 +720,12 @@
     const tagHTML = tagDefs.map(tag => `
       <button class="tag-card" data-tag="${tag.id}">
         <span class="tag-glyph">${icon(tag.id === "ward" ? "shield" : tag.id === "hold" ? "trend-up" : "sparkles")}</span>
-        <span class="tag-body"><strong>${tag.short}<span class="cat-count"> ${funds.filter(fund => fund.tags.includes(tag.id)).length}</span></strong><small>${tag.desc}</small></span>
+        <span class="tag-body"><strong>${tag.short}<span class="cat-count"> ${pool.filter(fund => fund.tags.includes(tag.id)).length}</span></strong><small>${tag.desc}</small></span>
         <span class="tag-toggle">${icon("check")}</span>
       </button>`).join("");
 
     const industryHTML = industries.map(item =>
-      `<button class="industry-chip" data-industry="${item.id}">${item.name}<small>${funds.filter(fund => fund.industry === item.id).length}</small></button>`).join("");
+      `<button class="industry-chip" data-industry="${item.id}">${item.name}<small>${pool.filter(fund => fund.industry === item.id).length}</small></button>`).join("");
 
     const themeHTML = themeGroups.map(group => `
       <div class="theme-group">
@@ -649,6 +735,14 @@
 
     panel.innerHTML = `
       <div class="filter-head"><h2>筛选条件</h2><button class="filter-reset" id="filterReset">重置</button></div>
+
+      <section class="filter-step" style="border-bottom:1px solid var(--line, #e8eff6);padding-bottom:12px">
+        <div class="scope-switch">
+          <button class="scope-btn ${state.dataScope === "curated" ? "active" : ""}" data-scope="curated">${icon("star")}精选池<small>${funds.length} 只</small></button>
+          <button class="scope-btn ${state.dataScope === "all" ? "active" : ""}" data-scope="all">${icon("grid")}全市场<small>${amNormalized.list.length ? amNormalized.list.length.toLocaleString() : "加载中"}</small></button>
+        </div>
+        <p class="step-hint" style="margin-top:8px">精选池为交行重点产品（含展业话术）；全市场覆盖约 2 万只公募基金（基础字段，首次切换需加载）。</p>
+      </section>
 
       <section class="filter-step">
         <div class="step-head"><span class="step-no">1</span><h3>策略类型</h3><span class="step-required">必选</span></div>
@@ -826,14 +920,14 @@
       </tr></thead>
       <tbody>${list.map(fund => `
         <tr class="${state.compare.includes(fund.id) ? "compare-on" : ""}">
-          <td><button class="fund-name-btn" data-open-type="screenerFund" data-open-id="${fund.id}"><strong>${escapeHTML(fund.name)}</strong><small>${fund.code} · ${escapeHTML(fund.company)}</small></button></td>
+          <td><button class="fund-name-btn" data-open-type="${fund.isAllMarket ? "allMarketFund" : "screenerFund"}" data-open-id="${fund.isAllMarket ? fund.code : fund.id}"><strong>${escapeHTML(fund.name)}</strong><small>${fund.code} · ${escapeHTML(fund.company)}</small></button></td>
           <td>${tagBadges(fund)}</td>
           <td>${fund.sub}</td>
           <td>${labelChips(fund)}</td>
           <td><span class="risk-pill ${fund.risk.toLowerCase()}">${fund.risk}</span></td>
           <td class="cell-num"><span class="ret ${dirClass(fund.ret.y1)}">${pct(fund.ret.y1)}</span></td>
-          <td class="cell-num">${fund.scale.toFixed(1)} 亿</td>
-          <td><div class="manager-cell">${escapeHTML(fund.manager)}<small>任职 ${fund.managerYears} 年</small></div></td>
+          <td class="cell-num">${fund.scale != null ? fund.scale.toFixed(1) : "0.0"} 亿</td>
+          <td><div class="manager-cell">${escapeHTML(fund.manager)}<small>${fund.isAllMarket ? "全市场" : "任职 " + fund.managerYears + " 年"}</small></div></td>
           <td class="cell-num live-cell">${livePctBadge(fund.code)}</td>
           <td>${rowActions(fund)}</td>
         </tr>`).join("")}
@@ -844,19 +938,19 @@
     return `<div class="fund-cards">${list.map(fund => `
       <div class="fund-card ${state.compare.includes(fund.id) ? "compare-on" : ""}">
         <div class="fund-card-top">
-          <button class="fund-card-title" data-open-type="screenerFund" data-open-id="${fund.id}"><strong>${escapeHTML(fund.name)}</strong><small>${fund.code} · ${fund.sub}</small></button>
+          <button class="fund-card-title" data-open-type="${fund.isAllMarket ? "allMarketFund" : "screenerFund"}" data-open-id="${fund.isAllMarket ? fund.code : fund.id}"><strong>${escapeHTML(fund.name)}</strong><small>${fund.code} · ${fund.sub}</small></button>
           ${livePctBadge(fund.code)}
           <span class="risk-pill ${fund.risk.toLowerCase()}">${fund.risk}</span>
         </div>
         <div class="fund-card-tags">${tagBadges(fund)}</div>
         <div class="fund-card-metrics">
           <div><span>近 1 年</span><strong class="${dirClass(fund.ret.y1)}">${pct(fund.ret.y1)}</strong></div>
-          <div><span>最大回撤</span><strong class="down">${fund.drawdown.toFixed(1)}%</strong></div>
-          <div><span>规模</span><strong>${fund.scale.toFixed(1)} 亿</strong></div>
+          <div><span>最大回撤</span><strong class="down">${fund.isAllMarket ? "—" : fund.drawdown.toFixed(1) + "%"}</strong></div>
+          <div><span>规模</span><strong>${fund.scale != null ? fund.scale.toFixed(1) : "0.0"} 亿</strong></div>
         </div>
         <div class="fund-card-labels">${labelChips(fund)}</div>
         <div class="fund-card-foot">
-          <span class="fund-card-manager">经理 <b>${escapeHTML(fund.manager)}</b> · ${fund.managerYears} 年</span>
+          <span class="fund-card-manager">${fund.isAllMarket ? "全市场 · " + escapeHTML(fund.company) : "经理 <b>" + escapeHTML(fund.manager) + "</b> · " + fund.managerYears + " 年"}</span>
           ${rowActions(fund)}
         </div>
       </div>`).join("")}</div>`;
@@ -890,7 +984,7 @@
     tray.hidden = false;
     tray.innerHTML = `<div class="compare-tray-inner">
       <div class="tray-label">已选 <b>${state.compare.length}</b> / 5 只</div>
-      <div class="tray-chips">${state.compare.map(id => `<span class="tray-chip"><span>${escapeHTML(fundMap[id].name)}</span><button data-compare-remove="${id}" aria-label="移除">${icon("x")}</button></span>`).join("")}</div>
+      <div class="tray-chips">${state.compare.map(id => `<span class="tray-chip"><span>${escapeHTML(activeFundMap()[id]?.name || "")}</span><button data-compare-remove="${id}" aria-label="移除">${icon("x")}</button></span>`).join("")}</div>
       <div class="tray-actions"><button class="tray-ghost" data-compare-clear>清空</button><button class="tray-primary" data-open-compare>开始对比</button></div>
     </div>`;
   }
@@ -928,7 +1022,7 @@
   }
 
   function compareHTML() {
-    const selected = state.compare.map(id => fundMap[id]).filter(Boolean);
+    const selected = state.compare.map(id => activeFundMap()[id]).filter(Boolean);
     if (!selected.length) return `<div class="empty-state"><strong>尚未选择对比基金</strong><p>请在列表中勾选 2—5 只基金。</p></div>`;
     const colors = ["#247cc1", "#c0783a", "#5b8f6b", "#8a6bb5", "#c05a56"];
     const legend = selected.map((fund, index) => `<span><i style="background:${colors[index % colors.length]}"></i>${escapeHTML(fund.name)}</span>`).join("");
@@ -1198,6 +1292,23 @@
         const body = $("#auxBody");
         body.classList.toggle("open");
         $("#auxToggle").classList.toggle("open");
+        return;
+      }
+      const scope = target.closest("[data-scope]");
+      if (scope) {
+        const val = scope.dataset.scope;
+        if (val === "all" && !allMarket.loaded) { ensureAllMarket(); }
+        if (val === "all" && !amNormalized.list.length) {
+          window.FundThinkTank && window.FundThinkTank.showToast("全市场数据加载中，请稍候…", "info");
+        }
+        state.dataScope = val;
+        if (val === "all") {
+          // 全市场下默认选中全市场实际存在的策略子类（权益+固收大类）
+          state.subs = new Set(["股票型", "偏股混合型", "指数型", "纯债型", "二级债基", "短债型", "货币基金"]);
+        } else {
+          state.subs = new Set(["股票型", "偏股混合型", "平衡混合型", "指数型"]);
+        }
+        renderFilterPanel(); renderResults();
         return;
       }
       if (target.closest("#filterReset")) { resetAll(); return; }
