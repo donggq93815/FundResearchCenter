@@ -24,6 +24,20 @@
 .scope-btn.active { background: var(--brand-50); border-color: var(--brand-500); color: var(--brand-700); }
 .scope-btn.active small { color: var(--brand-600); }
 
+.render-overflow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  margin-bottom: 10px;
+  background: #fff8e6;
+  border: 1px solid #f0e0b0;
+  border-radius: 8px;
+  font-size: 11px;
+  color: #8a6d1a;
+}
+.render-overflow svg { flex-shrink: 0; width: 14px; height: 14px; }
+
 .filter-step { padding: 14px 15px; border-bottom: 1px solid var(--line); }
 .filter-step:last-child { border-bottom: 0; }
 .step-head { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
