@@ -98,34 +98,95 @@
   }
 
   /* ============================ 全市场基金查询 ============================ */
-  // 读取 all_funds.json（约 2 万只公募基金），支持按名称/代码搜索。
-  // 数据源优先级：GitHub 最新 → 本地发布快照兜底。
-  // 懒加载：首屏不加载（7MB 文件慢），仅在用户聚焦搜索框时才加载。
+  // 读取 all_funds.json（精简版，约 2 万只公募基金），支持按名称/代码搜索。
+  // 数据源优先级：浏览器缓存(localStorage) → GitHub 最新 → 本地发布快照兜底。
+  // 懒加载：首屏不加载，仅在用户切"全市场"或聚焦搜索框时才加载。
   const allMarket = { loaded: false, loading: false, funds: [], total: 0 };
+  const AM_CACHE_KEY = "fundthinktank.allfunds.v1";
+  const AM_CACHE_MAX_AGE = 1000 * 60 * 60 * 6;  // 缓存 6 小时
+
+  // 精简版短字段名 -> 完整字段名（还原，供后续代码使用）
+  function expandSlimFund(f) {
+    return {
+      code: f.c,
+      name: f.n,
+      type: f.t,
+      nav_date: f.nd || "",
+      nav: f.nav !== undefined ? f.nav : null,
+      acc_nav: f.an !== undefined ? f.an : null,
+      d1: f.d1 !== undefined ? f.d1 : null,
+      w1: f.w1 !== undefined ? f.w1 : null,
+      m1: f.m1 !== undefined ? f.m1 : null,
+      m3: f.m3 !== undefined ? f.m3 : null,
+      m6: f.m6 !== undefined ? f.m6 : null,
+      y1: f.y1 !== undefined ? f.y1 : null,
+      y2: f.y2 !== undefined ? f.y2 : null,
+      y3: f.y3 !== undefined ? f.y3 : null,
+      ytd: f.ytd !== undefined ? f.ytd : null,
+      all: f.all !== undefined ? f.all : null,
+      est_date: f.ed || "",
+      scale: f.s !== undefined ? f.s : null,
+      fee_mgmt: f.fm || "",
+      fee_custody: f.fc || "",
+      company: f.co || null,
+      industry: f.ind || null,
+      themes: f.th || [],
+    };
+  }
+
+  function applyAllMarketData(j) {
+    allMarket.loaded = true;
+    allMarket.loading = false;
+    // 兼容：若数据已是精简版（有 c 字段），解包；否则视为完整版直接使用
+    const rawFunds = j.funds || [];
+    allMarket.funds = rawFunds.length && rawFunds[0].c !== undefined
+      ? rawFunds.map(expandSlimFund)
+      : rawFunds;
+    allMarket.total = j.total || allMarket.funds.length;
+    // 构建全市场归一化数据（供配基金筛选"全市场"范围使用）
+    buildAllMarketNormalized();
+    const countEl = document.getElementById("amsCount");
+    if (countEl) countEl.textContent = allMarket.total.toLocaleString() + " 只基金";
+    const inp = document.getElementById("allFundInput");
+    if (inp && inp.value.trim()) amsRenderResults(inp.value);
+    if (state.dataScope === "all") { renderFilterPanel(); renderResults(); }
+  }
+
+  function loadAllMarketFromCache() {
+    try {
+      const raw = localStorage.getItem(AM_CACHE_KEY);
+      if (!raw) return false;
+      const cached = JSON.parse(raw);
+      if (!cached || !cached.funds || !cached.funds.length) return false;
+      if (Date.now() - (cached.ts || 0) > AM_CACHE_MAX_AGE) return false;
+      applyAllMarketData(cached);
+      return true;
+    } catch (e) { return false; }
+  }
 
   function ensureAllMarket() {
     if (allMarket.loaded || allMarket.loading) return;
     allMarket.loading = true;
     const countEl = document.getElementById("amsCount");
     if (countEl) countEl.textContent = "加载中…";
+
+    // 1) 优先读浏览器缓存（6 小时内加载过则秒开）
+    if (loadAllMarketFromCache()) return;
+
+    // 2) 从网络加载（GitHub 最新 → jsDelivr → 本地）
     fetchFirstOk([
       DATA_RAW_BASE + "/data_service/output/all_funds.json",
       DATA_CDN_BASE + "/data_service/output/all_funds.json",
       "data_service/output/all_funds.json"
     ], { cache: "no-store" })
       .then(j => {
-        allMarket.loaded = true;
-        allMarket.loading = false;
-        allMarket.funds = j.funds || [];
-        allMarket.total = j.total || allMarket.funds.length;
-        if (countEl) countEl.textContent = allMarket.total.toLocaleString() + " 只基金";
-        // 构建全市场归一化数据（供配基金筛选"全市场"范围使用）
-        buildAllMarketNormalized();
-        // 数据加载完成后，若搜索框已有内容，自动重新渲染结果
-        const inp = document.getElementById("allFundInput");
-        if (inp && inp.value.trim()) amsRenderResults(inp.value);
-        // 若当前已是"全市场"范围，刷新筛选结果
-        if (state.dataScope === "all") { renderFilterPanel(); renderResults(); }
+        applyAllMarketData(j);
+        // 写入缓存（带时间戳）
+        try {
+          localStorage.setItem(AM_CACHE_KEY, JSON.stringify({
+            ts: Date.now(), total: allMarket.total, funds: j.funds || []
+          }));
+        } catch (e) { /* 缓存超限时静默忽略 */ }
       })
       .catch(() => {
         allMarket.loaded = false;
@@ -956,9 +1017,14 @@
       </div>`).join("")}</div>`;
   }
 
+  const MAX_RENDER = 200;  // 结果区单次最多渲染条数（全市场下防止 DOM 卡死）
+
   function renderResults() {
     const list = filtered();
-    renderToolbar(list.length);
+    const totalCount = list.length;
+    // 全市场下限制渲染条数，避免一次性渲染数千行导致卡顿
+    const renderList = list.slice(0, MAX_RENDER);
+    renderToolbar(totalCount);
     const area = $("#fundResultArea");
     if (!area) return;
     if (!state.subs.size) {
@@ -966,12 +1032,15 @@
       renderCompareTray();
       return;
     }
-    if (!list.length) {
+    if (!totalCount) {
       area.innerHTML = `<div class="empty-result">${icon("search")}<strong>当前组合无匹配产品</strong><p>建议放宽筛选条件，或减少行业概念与特色标签的叠加。</p><button class="btn btn-secondary btn-small" id="emptyReset">放宽筛选条件</button></div>`;
       const emptyReset = $("#emptyReset");
       if (emptyReset) emptyReset.addEventListener("click", resetAll, { once: true });
     } else {
-      area.innerHTML = state.view === "list" ? renderTableView(list) : renderCardView(list);
+      const overflow = totalCount > MAX_RENDER
+        ? `<div class="render-overflow">${icon("info")}共命中 <b>${totalCount.toLocaleString()}</b> 只，已展示前 ${MAX_RENDER} 只。请用左侧筛选条件（类型/规模/收益/行业）进一步收窄范围，以快速定位目标基金。</div>`
+        : "";
+      area.innerHTML = overflow + (state.view === "list" ? renderTableView(renderList) : renderCardView(renderList));
     }
     renderCompareTray();
   }
