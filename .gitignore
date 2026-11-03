@@ -37,3 +37,5 @@ data_service/cache/
 
 # 注意：data_service/output/*.json 需要提交（GitHub Actions 每日更新这些数据）
 # 不要忽略 output 目录
+# 但完整版 all_funds_full.json 体积大(8.5MB)且前端不需要，不提交
+data_service/output/all_funds_full.json
