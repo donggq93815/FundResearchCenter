@@ -147,6 +147,7 @@ def run_all_market():
     """拉取全市场公募基金列表（独立步骤，数据量大，单独文件输出）。"""
     import datetime
     import fetch_all_market
+    import slim_all_market
     print("\n== 拉取全市场公募基金列表（主源快照） ==")
     result = fetch_all_market.fetch_all_market()
     print("  全市场共 %d 只（实得 %d 只）" % (result["total"], len(result["funds"])))
@@ -162,7 +163,11 @@ def run_all_market():
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False)
-    print("[ok] 已输出 -> %s（%.2f MB）" % (out_path, os.path.getsize(out_path) / 1024 / 1024))
+    print("[ok] 完整版 -> %s（%.2f MB）" % (out_path, os.path.getsize(out_path) / 1024 / 1024))
+
+    # 生成精简版（前端筛选列表加载此文件，体积更小、加载更快）
+    slim_out = slim_all_market.slim_all_market()
+    print("[ok] 精简版 -> %s（%.2f MB）" % (slim_out, os.path.getsize(slim_out) / 1024 / 1024))
 
 
 def _now():
