@@ -462,20 +462,26 @@
   const tagMap = Object.fromEntries(tagDefs.map(item => [item.id, item]));
 
   /* ============================ 全市场数据归一化 ============================ */
-  // 把 all_funds.json 的全市场基金映射到配基金模块的字段结构，用于"全市场"数据范围筛选。
-  const AM_TYPE_TO_SUB = {
-    "股票型": "股票型", "混合型": "偏股混合型", "债券型": "纯债型", "指数型": "指数型",
-    "货币型": "货币基金", "QDII": "股票型QDII", "FOF": "股票FOF", "REITs": "REITs",
-    "商品型": "商品型", "其他": "偏股混合型",
-  };
+  // 全市场用东财的粗分类体系（与精选池的精细子类不同），避免类型归类错误。
+  // 东财类型：股票型/混合型/债券型/指数型/货币型/QDII/FOF/REITs/商品型/其他
+  const AM_GROUPS = [
+    { id: "equity", name: "权益类", subs: ["股票型", "混合型", "指数型"] },
+    { id: "fixed", name: "固收类", subs: ["债券型"] },
+    { id: "money", name: "货币类", subs: ["货币型"] },
+    { id: "qdii", name: "QDII", subs: ["QDII"] },
+    { id: "fof", name: "FOF", subs: ["FOF"] },
+    { id: "alt", name: "另类", subs: ["REITs", "商品型"] },
+    { id: "other", name: "其他", subs: ["其他"] },
+  ];
+  // 全市场子类 -> 大类（用于归一化时的 group 字段）
   const AM_SUB_TO_GROUP = {
-    "股票型": "equity", "偏股混合型": "equity", "平衡混合型": "equity", "指数型": "equity",
-    "纯债型": "fixed", "一级债基": "fixed", "二级债基": "fixed", "短债型": "fixed",
-    "偏债混合型": "fixedplus", "可转债型": "fixedplus",
-    "货币基金": "money",
-    "股票型QDII": "qdii", "债券型QDII": "qdii", "混合型QDII": "qdii",
-    "股票FOF": "fof", "债券FOF": "fof", "混合FOF": "fof",
-    "商品型": "alt", "REITs": "alt",
+    "股票型": "equity", "混合型": "equity", "指数型": "equity",
+    "债券型": "fixed",
+    "货币型": "money",
+    "QDII": "qdii",
+    "FOF": "fof",
+    "REITs": "alt", "商品型": "alt",
+    "其他": "other",
   };
   // 全市场归一化缓存：{ byId: {}, list: [] }
   const amNormalized = { byId: {}, list: [] };
@@ -502,8 +508,9 @@
   }
 
   function normalizeAllMarket(f) {
-    const sub = AM_TYPE_TO_SUB[f.type] || "偏股混合型";
-    const group = AM_SUB_TO_GROUP[sub] || "equity";
+    // 全市场直接用东财类型作为子类（不再硬塞进精选池精细子类）
+    const sub = AM_SUB_TO_GROUP[f.type] ? f.type : "其他";
+    const group = AM_SUB_TO_GROUP[sub] || "other";
     const estYear = f.est_date ? parseInt(f.est_date.slice(0, 4), 10) : null;
     const feeMgmt = f.fee_mgmt ? parseFloat(String(f.fee_mgmt).replace("%", "")) : null;
     return {
@@ -773,8 +780,11 @@
   /* ============================ 工具函数 ============================ */
   const pct = value => (value === null || value === undefined) ? "—" : `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
   const dirClass = value => (value === null || value === undefined) ? "" : value > 0 ? "up" : value < 0 ? "down" : "";
-  const activeCategoryIds = () => strategyGroups.filter(group => group.subs.some(sub => state.subs.has(sub))).map(group => group.id);
-  const equityActive = () => strategyGroups[0].subs.some(sub => state.subs.has(sub));
+  const activeCategoryIds = () => (state.dataScope === "all" && amNormalized.list.length ? AM_GROUPS : strategyGroups)
+    .filter(group => group.subs.some(sub => state.subs.has(sub))).map(group => group.id);
+  const equityActive = () => (state.dataScope === "all" && amNormalized.list.length ? AM_GROUPS[0] : strategyGroups[0])
+    .subs.some(sub => state.subs.has(sub));
+  const currentGroups = () => (state.dataScope === "all" && amNormalized.list.length ? AM_GROUPS : strategyGroups);
   const scaleMatch = (fund, key) => {
     if (key === "lt1") return fund.scale < 1;
     if (key === "s1") return fund.scale >= 1 && fund.scale < 10;
@@ -901,7 +911,7 @@
     const countIndustry = ind => isAM ? (amIndex.industry[ind] || []).length : pool.filter(fund => fund.industry === ind).length;
     const countTag = tag => isAM ? 0 : pool.filter(fund => fund.tags.includes(tag)).length;
 
-    const catHTML = strategyGroups.map(group => {
+    const catHTML = (isAM ? AM_GROUPS : strategyGroups).map(group => {
       const count = countGroup(group.subs);
       return `
         <div class="cat-item" data-cat="${group.id}">
@@ -1015,7 +1025,8 @@
 
   function syncFilterUI() {
     $$(".cat-item").forEach(item => {
-      const group = strategyGroups.find(entry => entry.id === item.dataset.cat);
+      const group = currentGroups().find(entry => entry.id === item.dataset.cat);
+      if (!group) return;
       item.classList.toggle("on", group.subs.some(sub => state.subs.has(sub)));
       item.classList.toggle("open", state.expanded.has(group.id));
     });
@@ -1443,7 +1454,8 @@
 
   /* ============================ 事件 ============================ */
   function toggleCategory(groupId) {
-    const group = strategyGroups.find(entry => entry.id === groupId);
+    const group = currentGroups().find(entry => entry.id === groupId);
+    if (!group) return;
     const allOn = group.subs.every(sub => state.subs.has(sub));
     if (allOn) group.subs.forEach(sub => state.subs.delete(sub));
     else { group.subs.forEach(sub => state.subs.add(sub)); state.expanded.add(groupId); }
@@ -1506,8 +1518,8 @@
         if (val === "all" && !allMarket.loaded) { ensureAllMarket(); }
         state.dataScope = val;
         if (val === "all") {
-          // 全市场下默认选中全市场实际存在的策略子类（权益+固收大类）
-          state.subs = new Set(["股票型", "偏股混合型", "指数型", "纯债型", "二级债基", "短债型", "货币基金"]);
+          // 全市场下默认选中全部东财类型，展示完整 20690 只
+          state.subs = new Set(AM_GROUPS.flatMap(g => g.subs));
           // 数据尚未构建完成时，显示加载态，避免渲染空结果
           if (!amNormalized.list.length) {
             const area = $("#fundResultArea");
