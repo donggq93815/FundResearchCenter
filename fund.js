@@ -143,13 +143,12 @@
       ? rawFunds.map(expandSlimFund)
       : rawFunds;
     allMarket.total = j.total || allMarket.funds.length;
-    // 构建全市场归一化数据（供配基金筛选"全市场"范围使用）
-    buildAllMarketNormalized();
     const countEl = document.getElementById("amsCount");
     if (countEl) countEl.textContent = allMarket.total.toLocaleString() + " 只基金";
     const inp = document.getElementById("allFundInput");
     if (inp && inp.value.trim()) amsRenderResults(inp.value);
-    if (state.dataScope === "all") { renderFilterPanel(); renderResults(); }
+    // 异步分片构建索引（完成后自动 renderFilterPanel + renderResults）
+    buildAllMarketNormalized();
   }
 
   function loadAllMarketFromCache() {
@@ -480,6 +479,18 @@
   };
   // 全市场归一化缓存：{ byId: {}, list: [] }
   const amNormalized = { byId: {}, list: [] };
+  // 预计算索引（消除每次交互的全量遍历，解决切换全市场卡死）
+  // 键 -> 基金 id 数组；用于筛选面板计数(O(1))和筛选候选集(O(k))
+  const amIndex = {
+    sub: {},        // 子类 -> [id]
+    industry: {},   // 行业 -> [id]
+    theme: {},      // 主题 -> [id]
+    risk: {},       // 风险 -> [id]
+    scale: {},      // 规模档 -> [id]
+    age: {},        // 年限档 -> [id]
+  };
+  // 归一化后的基金对象（惰性：只归一化当前需要的子集，避免一次创建 2 万对象）
+  const amFundCache = {};  // id -> 归一化对象（按需填充）
 
   function amRiskOf(type, scale) {
     // 按类型给一个近似风险等级（全市场数据无评级，供筛选/展示兜底）
@@ -524,9 +535,94 @@
   }
 
   function buildAllMarketNormalized() {
-    // 把 allMarket.funds（全市场原始数据）归一化，供筛选使用
-    amNormalized.list = allMarket.funds.map(normalizeAllMarket);
-    amNormalized.byId = Object.fromEntries(amNormalized.list.map(f => [f.id, f]));
+    // 把全市场原始数据构建索引，供筛选使用。
+    // 采用分片异步执行（每片 2000 条），避免一次性归一化 2 万条阻塞主线程导致卡死。
+    amNormalized.list = [];
+    amNormalized.byId = {};
+    for (const k in amIndex) amIndex[k] = {};
+    for (const k in amFundCache) delete amFundCache[k];
+
+    const fundsArr = allMarket.funds;
+    const n = fundsArr.length;
+    const CHUNK = 2000;
+    let cursor = 0;
+
+    const processChunk = () => {
+      const end = Math.min(cursor + CHUNK, n);
+      for (let i = cursor; i < end; i += 1) {
+        const f = fundsArr[i];
+        const norm = normalizeAllMarket(f);
+        amNormalized.list.push(norm);
+        amNormalized.byId[norm.id] = norm;
+        amFundCache[norm.id] = norm;
+        (amIndex.sub[norm.sub] || (amIndex.sub[norm.sub] = [])).push(norm.id);
+        if (norm.industry) (amIndex.industry[norm.industry] || (amIndex.industry[norm.industry] = [])).push(norm.id);
+        norm.themes.forEach(t => { (amIndex.theme[t.name] || (amIndex.theme[t.name] = [])).push(norm.id); });
+        (amIndex.risk[norm.risk] || (amIndex.risk[norm.risk] = [])).push(norm.id);
+        const s = norm.scale;
+        const sk = s < 1 ? "lt1" : s < 10 ? "s1" : s < 50 ? "s10" : s < 100 ? "s50" : "gt100";
+        (amIndex.scale[sk] || (amIndex.scale[sk] = [])).push(norm.id);
+        const age = 2026 - (norm.est || 2026);
+        const ak = age < 1 ? "lt1" : age < 3 ? "a1" : age < 5 ? "a3" : "gt5";
+        (amIndex.age[ak] || (amIndex.age[ak] = [])).push(norm.id);
+      }
+      cursor = end;
+      if (cursor < n) {
+        // 让出主线程，继续下一片
+        setTimeout(processChunk, 0);
+      } else {
+        // 全部完成：刷新筛选面板与结果
+        renderFilterPanel();
+        renderResults();
+      }
+    };
+    processChunk();
+  }
+
+  // 从索引取候选集：返回 id 数组（按多个维度取交集，取最小集合做基准）
+  function amCandidateIds() {
+    const subs = [...state.subs];
+    // 先按 sub 取并集（多个子类）
+    let ids = null;
+    if (subs.length) {
+      const merged = new Set();
+      subs.forEach(sub => { (amIndex.sub[sub] || []).forEach(id => merged.add(id)); });
+      ids = merged;
+    }
+    if (!ids || !ids.size) return [];
+    // 依次按 industry/theme/risk/scale/age 取交集
+    const intersect = set => {
+      if (!set.size) return;
+      const next = new Set();
+      set.forEach(id => { if (ids.has(id)) next.add(id); });
+      ids = next;
+    };
+    if (state.industries.size) {
+      const s = new Set();
+      [...state.industries].forEach(ind => (amIndex.industry[ind] || []).forEach(id => s.add(id)));
+      intersect(s);
+    }
+    if (state.themes.size) {
+      const s = new Set();
+      [...state.themes].forEach(t => (amIndex.theme[t] || []).forEach(id => s.add(id)));
+      intersect(s);
+    }
+    if (state.risk.size) {
+      const s = new Set();
+      [...state.risk].forEach(r => (amIndex.risk[r] || []).forEach(id => s.add(id)));
+      intersect(s);
+    }
+    if (state.scales.size) {
+      const s = new Set();
+      [...state.scales].forEach(k => (amIndex.scale[k] || []).forEach(id => s.add(id)));
+      intersect(s);
+    }
+    if (state.ages.size) {
+      const s = new Set();
+      [...state.ages].forEach(k => (amIndex.age[k] || []).forEach(id => s.add(id)));
+      intersect(s);
+    }
+    return [...ids];
   }
 
   /* ============================ 销售一页纸数据（演示） ============================ */
@@ -746,6 +842,7 @@
   function sorted(list) {
     const copy = [...list];
     const byY1 = (a, b) => (b.ret?.y1 ?? -9) - (a.ret?.y1 ?? -9);
+    const isAM = state.dataScope === "all";
     switch (state.sort) {
       case "y1desc": return copy.sort(byY1);
       case "m3desc": return copy.sort((a, b) => (b.ret?.m3 ?? -9) - (a.ret?.m3 ?? -9));
@@ -753,19 +850,59 @@
       case "sharpedesc": return copy.sort((a, b) => (b.sharpe ?? -9) - (a.sharpe ?? -9));
       case "scaledesc": return copy.sort((a, b) => (b.scale ?? 0) - (a.scale ?? 0));
       case "estdesc": return copy.sort((a, b) => (b.est ?? 0) - (a.est ?? 0));
-      default: return copy.sort((a, b) => (tagMatchCount(b) - tagMatchCount(a)) || byY1(a, b));
+      // 全市场无交行标签，默认直接按近 1 年降序（跳过 tagMatchCount，加速排序）
+      default: return copy.sort((a, b) => (isAM ? byY1(a, b) : (tagMatchCount(b) - tagMatchCount(a)) || byY1(a, b)));
     }
   }
 
-  const filtered = () => (state.subs.size ? sorted(activePool().filter(matches)) : []);
+  // 全市场下用索引加速筛选（避免 20690 条全量遍历）
+  function filteredAllMarket() {
+    if (!state.subs.size) return [];
+    const ids = amCandidateIds();  // 索引候选集（已满足 sub/industry/theme/risk/scale/age）
+    // 剩余条件（fee/perfMin/company/manager/tags）在候选集上过滤
+    const list = [];
+    for (const id of ids) {
+      const fund = amFundCache[id];
+      if (!fund) continue;
+      // tags：全市场无交行标签，若选了标签则全市场不命中
+      if (state.tags.size) continue;
+      if (state.fee) {
+        if (state.fee === "low" && fund.feeMgmt > 0.30) continue;
+        if (state.fee === "mid" && !(fund.feeMgmt > 0.30 && fund.feeMgmt <= 0.80)) continue;
+        if (state.fee === "high" && fund.feeMgmt <= 0.80) continue;
+      }
+      if (state.perfMin !== null && state.perfMin !== "") {
+        const value = fund.ret[state.perfPeriod];
+        if (value === null || value === undefined || value < Number(state.perfMin)) continue;
+      }
+      if (state.company && !fund.company.toLowerCase().includes(state.company.toLowerCase())) continue;
+      if (state.manager && !fund.manager.toLowerCase().includes(state.manager.toLowerCase())) continue;
+      list.push(fund);
+    }
+    return sorted(list);
+  }
+
+  const filtered = () => {
+    if (state.dataScope === "all" && amNormalized.list.length) return filteredAllMarket();
+    return state.subs.size ? sorted(funds.filter(matches)) : [];
+  };
 
   /* ============================ 筛选面板 ============================ */
   function renderFilterPanel() {
     const panel = $("#fundFilter");
     if (!panel) return;
     const pool = activePool();
+    const isAM = state.dataScope === "all" && amNormalized.list.length;
+    // 全市场用索引计数(O(1))，精选池用 filter
+    const countSub = sub => isAM ? (amIndex.sub[sub] || []).length : pool.filter(fund => fund.sub === sub).length;
+    const countGroup = subs => isAM
+      ? subs.reduce((acc, sub) => acc + (amIndex.sub[sub] || []).length, 0)
+      : pool.filter(fund => subs.includes(fund.sub)).length;
+    const countIndustry = ind => isAM ? (amIndex.industry[ind] || []).length : pool.filter(fund => fund.industry === ind).length;
+    const countTag = tag => isAM ? 0 : pool.filter(fund => fund.tags.includes(tag)).length;
+
     const catHTML = strategyGroups.map(group => {
-      const count = pool.filter(fund => group.subs.includes(fund.sub)).length;
+      const count = countGroup(group.subs);
       return `
         <div class="cat-item" data-cat="${group.id}">
           <div class="cat-row">
@@ -773,7 +910,7 @@
             <button class="cat-name" data-cat-toggle="${group.id}">${group.name}<span class="cat-count">${count}</span></button>
             <button class="cat-expand" data-cat-expand="${group.id}" aria-label="展开${group.name}">${icon("chevron-down")}</button>
           </div>
-          <div class="cat-chips">${group.subs.map(sub => `<button class="mini-chip" data-sub="${sub}">${sub}<small>${pool.filter(fund => fund.sub === sub).length}</small></button>`).join("")}</div>
+          <div class="cat-chips">${group.subs.map(sub => `<button class="mini-chip" data-sub="${sub}">${sub}<small>${countSub(sub)}</small></button>`).join("")}</div>
           <div class="cat-hint">${group.subs.join(" / ")}</div>
         </div>`;
     }).join("");
@@ -781,12 +918,12 @@
     const tagHTML = tagDefs.map(tag => `
       <button class="tag-card" data-tag="${tag.id}">
         <span class="tag-glyph">${icon(tag.id === "ward" ? "shield" : tag.id === "hold" ? "trend-up" : "sparkles")}</span>
-        <span class="tag-body"><strong>${tag.short}<span class="cat-count"> ${pool.filter(fund => fund.tags.includes(tag.id)).length}</span></strong><small>${tag.desc}</small></span>
+        <span class="tag-body"><strong>${tag.short}<span class="cat-count"> ${countTag(tag.id)}</span></strong><small>${tag.desc}</small></span>
         <span class="tag-toggle">${icon("check")}</span>
       </button>`).join("");
 
     const industryHTML = industries.map(item =>
-      `<button class="industry-chip" data-industry="${item.id}">${item.name}<small>${pool.filter(fund => fund.industry === item.id).length}</small></button>`).join("");
+      `<button class="industry-chip" data-industry="${item.id}">${item.name}<small>${countIndustry(item.id)}</small></button>`).join("");
 
     const themeHTML = themeGroups.map(group => `
       <div class="theme-group">
@@ -1367,13 +1504,17 @@
       if (scope) {
         const val = scope.dataset.scope;
         if (val === "all" && !allMarket.loaded) { ensureAllMarket(); }
-        if (val === "all" && !amNormalized.list.length) {
-          window.FundThinkTank && window.FundThinkTank.showToast("全市场数据加载中，请稍候…", "info");
-        }
         state.dataScope = val;
         if (val === "all") {
           // 全市场下默认选中全市场实际存在的策略子类（权益+固收大类）
           state.subs = new Set(["股票型", "偏股混合型", "指数型", "纯债型", "二级债基", "短债型", "货币基金"]);
+          // 数据尚未构建完成时，显示加载态，避免渲染空结果
+          if (!amNormalized.list.length) {
+            const area = $("#fundResultArea");
+            if (area) area.innerHTML = `<div class="empty-result">${icon("search")}<strong>正在加载全市场数据…</strong><p>约 2 万只基金正在构建索引，请稍候（首次加载约 1—3 秒）。</p></div>`;
+            window.FundThinkTank && window.FundThinkTank.showToast("全市场数据加载中，请稍候…", "info");
+            return;
+          }
         } else {
           state.subs = new Set(["股票型", "偏股混合型", "平衡混合型", "指数型"]);
         }
