@@ -152,20 +152,21 @@ def run_all_market():
     result = fetch_all_market.fetch_all_market()
     print("  全市场共 %d 只（实得 %d 只）" % (result["total"], len(result["funds"])))
 
-    out_path = os.path.join(config.OUTPUT_DIR, "all_funds.json")
+    # 完整版（备份/详情用）
+    full_path = os.path.join(config.OUTPUT_DIR, "all_funds_full.json")
     payload = {
         "generated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "total": result["total"],
         "categories": result["categories"],
         "funds": result["funds"],
         "source": "东方财富",
-        "note": "全市场公募基金列表（主源快照），三源交叉验证仅针对活跃/查看中基金",
+        "note": "全市场公募基金列表（完整版），三源交叉验证仅针对活跃/查看中基金",
     }
-    with open(out_path, "w", encoding="utf-8") as f:
+    with open(full_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False)
-    print("[ok] 完整版 -> %s（%.2f MB）" % (out_path, os.path.getsize(out_path) / 1024 / 1024))
+    print("[ok] 完整版 -> %s（%.2f MB）" % (full_path, os.path.getsize(full_path) / 1024 / 1024))
 
-    # 生成精简版（前端筛选列表加载此文件，体积更小、加载更快）
+    # 精简版（前端筛选列表加载此文件，体积更小、加载更快）
     slim_out = slim_all_market.slim_all_market()
     print("[ok] 精简版 -> %s（%.2f MB）" % (slim_out, os.path.getsize(slim_out) / 1024 / 1024))
 
