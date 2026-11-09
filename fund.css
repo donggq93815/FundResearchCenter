@@ -451,3 +451,100 @@
   color: #8a97a5;
   font-size: 13px;
 }
+
+/* ============ 四类精选池（每日更新） ============ */
+.fund-mode-switch { display: flex; gap: 10px; margin-bottom: 14px; }
+.fund-mode-switch .mode-btn {
+  flex: 1; display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  cursor: pointer; text-align: left; transition: all .15s;
+}
+.fund-mode-switch .mode-btn svg { width: 20px; height: 20px; color: var(--ink-400); flex-shrink: 0; }
+.fund-mode-switch .mode-btn .mode-label { display: flex; flex-direction: column; gap: 2px; font-size: 13px; font-weight: 600; color: var(--ink-700); }
+.fund-mode-switch .mode-btn .mode-label small { font-weight: 400; font-size: 10px; color: var(--ink-400); }
+.fund-mode-switch .mode-btn:hover { border-color: var(--brand-300); }
+.fund-mode-switch .mode-btn.active { background: var(--brand-50); border-color: var(--brand-500); box-shadow: 0 1px 4px rgba(30,100,180,.08); }
+.fund-mode-switch .mode-btn.active svg, .fund-mode-switch .mode-btn.active .mode-label { color: var(--brand-700); }
+.fund-mode-switch .mode-btn.active .mode-label small { color: var(--brand-600); }
+
+.ep-overview { padding: 18px 20px; }
+.ep-overview-head h2 { font-size: 16px; font-weight: 700; color: var(--ink-800); margin: 2px 0 6px; }
+.ep-overview-head p { font-size: 11px; color: var(--ink-500); line-height: 1.7; }
+.ep-overview-head p b { color: var(--ink-700); }
+.ep-pool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-top: 14px; }
+.ep-pool-card { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 16px; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; transition: all .15s; }
+.ep-pool-card:hover { border-color: var(--brand-400); box-shadow: 0 4px 14px rgba(20,60,120,.08); transform: translateY(-1px); }
+.ep-pool-head { display: flex; align-items: center; gap: 8px; }
+.ep-pool-head h3 { font-size: 14px; font-weight: 700; color: var(--ink-800); }
+.ep-pool-tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 600; color: #fff; background: var(--brand-500); }
+.ep-red.ep-pool-tag, .ep-pool-card.ep-red .ep-pool-tag { background: #d64541; }
+.ep-blue.ep-pool-tag, .ep-pool-card.ep-blue .ep-pool-tag { background: #2f6fb3; }
+.ep-green.ep-pool-tag, .ep-pool-card.ep-green .ep-pool-tag { background: #2e9e6b; }
+.ep-purple.ep-pool-tag, .ep-pool-card.ep-purple .ep-pool-tag { background: #7a5bbf; }
+.ep-pool-pos { font-size: 11px; color: var(--ink-500); line-height: 1.6; min-height: 34px; }
+.ep-pool-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 10px 0; border-top: 1px dashed var(--line); }
+.ep-pool-stats > div { display: flex; flex-direction: column; gap: 2px; }
+.ep-pool-stats span { font-size: 9px; color: var(--ink-400); }
+.ep-pool-stats b { font-size: 12px; color: var(--ink-800); }
+.ep-pool-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; color: var(--ink-400); }
+.ep-pool-foot svg { width: 12px; height: 12px; }
+.ep-pool-link { display: inline-flex; align-items: center; gap: 3px; color: var(--brand-600); font-weight: 600; }
+.ep-pool-link svg { transform: rotate(-90deg); }
+.ep-meta-note { display: flex; align-items: flex-start; gap: 7px; margin-top: 14px; padding: 9px 12px; background: #f7fafc; border: 1px solid var(--line); border-radius: 8px; font-size: 10px; color: var(--ink-500); line-height: 1.7; }
+.ep-meta-note svg { flex-shrink: 0; width: 13px; height: 13px; margin-top: 1px; color: var(--ink-400); }
+
+.ep-pool-detail { padding: 18px 20px; }
+.ep-back { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 10px; padding: 4px 10px; background: #f7fafc; border: 1px solid var(--line); border-radius: 6px; font-size: 11px; color: var(--ink-600); cursor: pointer; }
+.ep-back:hover { border-color: var(--brand-300); color: var(--brand-600); }
+.ep-back svg { width: 12px; height: 12px; transform: rotate(90deg); }
+.ep-detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.ep-detail-head h2 { font-size: 17px; font-weight: 700; color: var(--ink-800); margin: 4px 0; }
+.ep-detail-head p { font-size: 11px; color: var(--ink-500); }
+.ep-detail-stats { display: flex; gap: 18px; }
+.ep-detail-stats > div { display: flex; flex-direction: column; gap: 3px; }
+.ep-detail-stats span { font-size: 10px; color: var(--ink-400); }
+.ep-detail-stats b { font-size: 14px; color: var(--ink-800); }
+.ep-rules { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.ep-rules > div { padding: 11px 13px; background: #f9fbfd; border: 1px solid var(--line); border-radius: 10px; }
+.ep-rules h4 { font-size: 11px; font-weight: 600; color: var(--ink-700); margin-bottom: 7px; }
+.ep-rules ul { list-style: none; }
+.ep-rules li { display: flex; align-items: baseline; gap: 6px; padding: 2px 0; font-size: 10.5px; color: var(--ink-600); line-height: 1.6; }
+.ep-rules li i { font-style: normal; color: #2e9e6b; font-weight: 700; }
+.ep-tier-tabs { display: flex; align-items: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.ep-tier-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 13px; background: #f7fafc; border: 1px solid var(--line); border-radius: 999px; font-size: 11px; font-weight: 600; color: var(--ink-600); cursor: pointer; transition: all .15s; }
+.ep-tier-btn small { font-weight: 400; font-size: 9.5px; color: var(--ink-400); }
+.ep-tier-btn.active { background: var(--brand-50); border-color: var(--brand-500); color: var(--brand-700); }
+.ep-tier-hint { font-size: 10px; color: var(--ink-400); }
+.ep-table-wrap { margin-top: 10px; overflow-x: auto; }
+.ep-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.ep-table th { position: sticky; top: 0; padding: 8px 9px; background: #f7fafc; border-bottom: 1px solid var(--line); font-size: 10px; font-weight: 600; color: var(--ink-500); text-align: left; white-space: nowrap; }
+.ep-table td { padding: 9px 9px; border-bottom: 1px solid #eef3f8; color: var(--ink-600); white-space: nowrap; }
+.ep-table tbody tr { cursor: pointer; transition: background .12s; }
+.ep-table tbody tr:hover { background: var(--brand-50); }
+.ep-rank { color: var(--ink-400); font-variant-numeric: tabular-nums; }
+.ep-name b { display: block; font-size: 11.5px; color: var(--ink-800); }
+.ep-name small { display: block; margin-top: 1px; font-size: 9.5px; color: var(--ink-400); }
+.ep-tier-badge { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 9.5px; font-weight: 700; }
+.ep-tier-badge.core { color: #b25400; background: #fff3e0; border: 1px solid #f0d0a0; }
+.ep-tier-badge.observe { color: #4a6a8a; background: #eef4fa; border: 1px solid #d5e3f0; }
+.ep-empty { text-align: center; color: var(--ink-400); padding: 26px 0 !important; }
+
+/* 精选池产品详情（抽屉） */
+.ep-hero-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.ep-tabs { display: flex; gap: 6px; margin: 14px 0 4px; border-bottom: 1px solid var(--line); }
+.ep-tab { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; background: none; border: none; border-bottom: 2px solid transparent; font-size: 12px; font-weight: 600; color: var(--ink-500); cursor: pointer; }
+.ep-tab svg { width: 13px; height: 13px; }
+.ep-tab:hover { color: var(--brand-600); }
+.ep-tab.active { color: var(--brand-700); border-bottom-color: var(--brand-500); }
+.ep-hl-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.ep-hl-list li { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; background: #f9fbfd; border: 1px solid var(--line); border-radius: 9px; font-size: 12px; color: var(--ink-700); line-height: 1.7; }
+.ep-hl-list li svg { flex-shrink: 0; width: 14px; height: 14px; margin-top: 2px; color: #2e9e6b; }
+.ep-mgr-text { font-size: 12px; color: var(--ink-600); line-height: 1.9; }
+.ep-script { display: flex; flex-direction: column; gap: 10px; }
+.ep-script-item { padding: 10px 12px; background: #f9fbfd; border: 1px solid var(--line); border-radius: 9px; }
+.ep-script-item h5 { font-size: 10.5px; font-weight: 700; color: var(--brand-600); margin-bottom: 4px; }
+.ep-script-item p { font-size: 12px; color: var(--ink-700); line-height: 1.8; }
+.ep-copy-row { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+.fund-layout[hidden] { display: none !important; }
+#elitePoolsArea[hidden] { display: none !important; }

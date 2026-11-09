@@ -774,7 +774,7 @@
     compare: [],
     watch: new Set(),
     expanded: new Set(["equity"]),
-    dataScope: "curated"  // "curated" = 精选池(17只) | "all" = 全市场(2万只)
+    dataScope: "elite"  // "elite" = 四类精选池 | "curated" = 行内精选池(17只) | "all" = 全市场(2万只)
   };
 
   /* ============================ 工具函数 ============================ */
@@ -1481,6 +1481,43 @@
       const page = $("#fundPage");
       if (!page || page.hidden) return;
 
+      /* ---- 四类精选池交互 ---- */
+      const modeBtn = target.closest("[data-fmode]");
+      if (modeBtn) {
+        state.dataScope = modeBtn.dataset.fmode === "elite" ? "elite" : "curated";
+        eliteState.view = "overview";
+        eliteState.pool = null;
+        eliteState.tier = "all";
+        applyFundMode();
+        renderFilterPanel();
+        syncFilterUI();
+        renderResults();
+        return;
+      }
+      const epPool = target.closest("[data-ep-pool]");
+      if (epPool) { eliteState.view = "pool"; eliteState.pool = epPool.dataset.epPool; eliteState.tier = "all"; renderElite(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+      if (target.closest("[data-ep-back]")) { eliteState.view = "overview"; eliteState.pool = null; renderElite(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+      const epTier = target.closest("[data-ep-tier]");
+      if (epTier) { eliteState.tier = epTier.dataset.epTier; renderElite(); return; }
+      const epFund = target.closest("[data-ep-fund]");
+      if (epFund) { window.FundThinkTank && window.FundThinkTank.openDrawer("eliteFund", epFund.dataset.epFund); return; }
+      const epTab = target.closest("[data-ep-tab]");
+      if (epTab) {
+        const kind = epTab.dataset.epTab;
+        $$(".ep-tab").forEach(t => t.classList.toggle("active", t === epTab));
+        $$(".ep-panel").forEach(p => { p.hidden = p.dataset.epPanel !== kind; });
+        return;
+      }
+      const epCopy = target.closest("[data-ep-copy]");
+      if (epCopy) {
+        const kind = epCopy.dataset.epCopy;
+        const code = epCopy.dataset.epCode;
+        const text = kind === "all" ? epAllCopyText(code)
+          : (() => { const hit = epFindFund(code); return hit ? epCopyText(hit.fund, eliteState.data.pools[hit.poolId].name, kind) : ""; })();
+        if (text) window.FundThinkTank && window.FundThinkTank.copyText(text, "已复制，请人工复核并经合规确认后使用");
+        return;
+      }
+
       const catToggle = target.closest("[data-cat-toggle]");
       if (catToggle) { toggleCategory(catToggle.dataset.catToggle); return; }
       const catExpand = target.closest("[data-cat-expand]");
@@ -1603,6 +1640,333 @@
     });
   }
 
+  /* ============================ 四类精选池（每日更新） ============================ */
+  // 数据由 GitHub Actions 每日按《四类精选池命名与量化选品规则》计算：
+  // 进取精选池（权益）/ 稳健底仓池（债券）/ 稳进增强池（固收+）/ 多元配置池（FOF）
+  const EP_CACHE_KEY = "fundthinktank.elite.v1";
+  const EP_CACHE_MAX_AGE = 1000 * 60 * 60 * 6;  // 缓存 6 小时
+  const eliteState = {
+    loaded: false, loading: false, data: null,
+    view: "overview",  // overview | pool
+    pool: null,        // 当前查看的池 id
+    tier: "all",       // all | core | observe
+  };
+  const EP_POOL_ORDER = ["equity", "bond", "fixedplus", "fof"];
+  const EP_TIER_BADGE = { core: "核心", observe: "观察" };
+
+  function applyEliteData(j) {
+    eliteState.data = j;
+    eliteState.loaded = true;
+    eliteState.loading = false;
+    renderElite();
+  }
+
+  function loadEliteFromCache() {
+    try {
+      const raw = localStorage.getItem(EP_CACHE_KEY);
+      if (!raw) return false;
+      const cached = JSON.parse(raw);
+      if (!cached || !cached.pools) return false;
+      if (Date.now() - (cached.ts || 0) > EP_CACHE_MAX_AGE) return false;
+      applyEliteData(cached);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function ensureElitePools() {
+    if (eliteState.loaded || eliteState.loading) return;
+    eliteState.loading = true;
+    if (loadEliteFromCache()) return;
+    eliteState.loading = true;  // 缓存未命中时继续网络加载
+    fetchFirstOk([
+      DATA_RAW_BASE + "/data_service/output/elite_pools.json",
+      DATA_CDN_BASE + "/data_service/output/elite_pools.json",
+      "data_service/output/elite_pools.json"
+    ], { cache: "no-store" })
+      .then(j => {
+        try {
+          localStorage.setItem(EP_CACHE_KEY, JSON.stringify({ ts: Date.now(), ...j }));
+        } catch (e) { /* 缓存超限时静默忽略 */ }
+        applyEliteData(j);
+      })
+      .catch(() => {
+        eliteState.loading = false;
+        const area = $("#elitePoolsArea");
+        if (area && state.dataScope === "elite") {
+          area.innerHTML = `<div class="empty-result">${icon("alert")}<strong>精选池数据加载失败</strong><p>数据源暂不可用，请稍后刷新重试。</p></div>`;
+        }
+      });
+  }
+
+  function epFindFund(code) {
+    if (!eliteState.data) return null;
+    for (const pid of EP_POOL_ORDER) {
+      const pool = eliteState.data.pools && eliteState.data.pools[pid];
+      if (!pool) continue;
+      const inCore = pool.core.find(x => x.code === code);
+      if (inCore) return { fund: inCore, poolId: pid, tier: "core" };
+      const inObs = pool.observe.find(x => x.code === code);
+      if (inObs) return { fund: inObs, poolId: pid, tier: "observe" };
+    }
+    return null;
+  }
+
+  function epFmt(v, suffix) {
+    if (v === null || v === undefined) return "—";
+    return Number(v).toFixed(2).replace(/\.?0+$/, "") + (suffix || "");
+  }
+  function epRankWord(rp) {
+    if (rp === null || rp === undefined) return "—";
+    const p = Math.max(1, Math.round(rp * 100));
+    return "前 " + p + "%";
+  }
+
+  function eliteOverviewHTML() {
+    const d = eliteState.data;
+    const cards = EP_POOL_ORDER.map(pid => {
+      const pool = d.pools[pid];
+      if (!pool) return "";
+      const s = pool.stats || {};
+      return `
+        <button class="ep-pool-card ep-${pool.color || "blue"}" data-ep-pool="${pid}">
+          <div class="ep-pool-head">
+            <span class="ep-pool-tag">${pool.asset || ""}</span>
+            <h3>${escapeHTML(pool.name)}</h3>
+          </div>
+          <p class="ep-pool-pos">${escapeHTML(pool.positioning || "")}</p>
+          <div class="ep-pool-stats">
+            <div><span>核心池</span><b>${s.core_count != null ? s.core_count : "—"} 只</b></div>
+            <div><span>观察池</span><b>${s.observe_count != null ? s.observe_count : "—"} 只</b></div>
+            <div><span>平均近3年年化</span><b>${s.avg_ann3 != null ? epFmt(s.avg_ann3, "%") : "—"}</b></div>
+            <div><span>平均最大回撤</span><b>${s.avg_mdd3 != null ? epFmt(s.avg_mdd3, "%") : "—"}</b></div>
+          </div>
+          <div class="ep-pool-foot"><span>${icon("users")}适配：${escapeHTML(pool.client_fit || "")}</span><span class="ep-pool-link">进入${icon("chevron-down")}</span></div>
+        </button>`;
+    }).join("");
+    return `
+      <section class="card ep-overview">
+        <div class="ep-overview-head">
+          <div>
+            <span class="section-kicker">四类精选池</span>
+            <h2>按功能定位命名的四大产品池</h2>
+            <p>数据更新时间 <b>${d.generated_at || "—"}</b> · 规则版本 ${d.rule_version || "—"}。入池统一门槛：${(d.general_gate || []).join("；")}。</p>
+          </div>
+        </div>
+        <div class="ep-pool-grid">${cards}</div>
+        <div class="ep-meta-note">${icon("info")}${escapeHTML((d.meta && d.meta.risk_metrics_method) || "")}</div>
+      </section>`;
+  }
+
+  function elitePoolHTML(pid) {
+    const d = eliteState.data;
+    const pool = d.pools && d.pools[pid];
+    if (!pool) return `<div class="empty-result">${icon("alert")}<strong>未找到该池</strong></div>`;
+    const s = pool.stats || {};
+    const tierBtn = (id, label, count) => `
+      <button class="ep-tier-btn ${eliteState.tier === id ? "active" : ""}" data-ep-tier="${id}">${label}<small>${count}</small></button>`;
+    const rows = (eliteState.tier === "all"
+      ? [...pool.core.map(x => ({ ...x, _tier: "core" })), ...pool.observe.map(x => ({ ...x, _tier: "observe" }))]
+      : (pool[eliteState.tier] || []).map(x => ({ ...x, _tier: eliteState.tier })));
+    const tableRows = rows.map((f, i) => {
+      const m = f.metrics || {};
+      return `
+        <tr data-ep-fund="${f.code}" title="点击查看营销亮点、经理解读与销售话术">
+          <td class="ep-rank">${i + 1}</td>
+          <td class="ep-name"><b>${escapeHTML(f.name)}</b><small>${f.code} · ${escapeHTML(f.company || "—")}</small></td>
+          <td><span class="ep-tier-badge ${f._tier}">${EP_TIER_BADGE[f._tier]}</span></td>
+          <td>${f.scale != null ? epFmt(f.scale, "亿") : "—"}</td>
+          <td class="${(f.y1 || 0) > 0 ? "live-up" : "live-down"}">${f.y1 != null ? (f.y1 > 0 ? "+" : "") + epFmt(f.y1, "%") : "—"}</td>
+          <td>${epFmt(m.ann3, "%")}</td>
+          <td>${epFmt(m.mdd3, "%")}</td>
+          <td>${epFmt(m.sharpe)}</td>
+          <td>${epRankWord(f.rank_pct)}</td>
+          <td><b>${epFmt(f.score)}</b></td>
+        </tr>`;
+    }).join("");
+    const ruleList = (rules, passed) => `<ul>${rules.map(r => `<li>${escapeHTML(r[0])}${passed != null ? `<i>${passed ? "✓" : "—"}</i>` : ""}</li>`).join("")}</ul>`;
+    return `
+      <section class="card ep-pool-detail">
+        <button class="ep-back" data-ep-back>${icon("chevron-down")}返回池总览</button>
+        <div class="ep-detail-head">
+          <div>
+            <span class="ep-pool-tag ep-${pool.color || "blue"}">${pool.asset}</span>
+            <h2>${escapeHTML(pool.name)}</h2>
+            <p>${escapeHTML(pool.positioning || "")}</p>
+          </div>
+          <div class="ep-detail-stats">
+            <div><span>通用门槛通过</span><b>${s.gate_pass != null ? s.gate_pass : "—"} 只</b></div>
+            <div><span>量化准入通过</span><b>${s.admission_pass != null ? s.admission_pass : "—"} 只</b></div>
+            <div><span>平均夏普（估）</span><b>${s.avg_sharpe != null ? epFmt(s.avg_sharpe) : "—"}</b></div>
+          </div>
+        </div>
+        <div class="ep-rules">
+          <div><h4>准入条件（全部满足才可入池）</h4>${ruleList(pool.rules.admission)}</div>
+          <div><h4>优选条件（全部满足进入核心池）</h4>${ruleList(pool.rules.preferred)}</div>
+        </div>
+        <div class="ep-tier-tabs">
+          ${tierBtn("all", "全部", (pool.core || []).length + (pool.observe || []).length)}
+          ${tierBtn("core", "核心池", (pool.core || []).length)}
+          ${tierBtn("observe", "观察池", (pool.observe || []).length)}
+          <span class="ep-tier-hint">核心池 = 准入 + 优选全部满足；观察池 = 仅满足准入。点击行查看营销亮点、经理解读与销售话术。</span>
+        </div>
+        <div class="ep-table-wrap">
+          <table class="ep-table">
+            <thead><tr><th>#</th><th>基金</th><th>分级</th><th>规模</th><th>近1年</th><th>近3年年化</th><th>最大回撤(估)</th><th>夏普(估)</th><th>同类排名</th><th>综合分</th></tr></thead>
+            <tbody>${tableRows || `<tr><td colspan="10" class="ep-empty">当前分级暂无产品</td></tr>`}</tbody>
+          </table>
+        </div>
+        <div class="ep-meta-note">${icon("info")}风险指标为估算口径（见池总览说明）；池内产品按综合分排序，综合分 = 收益 30% + 夏普 25% + 卡玛 20% + 回撤 15% + 排名 10%。</div>
+      </section>`;
+  }
+
+  function renderElite() {
+    const area = $("#elitePoolsArea");
+    if (!area) return;
+    if (state.dataScope !== "elite") { area.hidden = true; area.innerHTML = ""; return; }
+    area.hidden = false;
+    if (!eliteState.loaded) {
+      area.innerHTML = `<div class="empty-result">${icon("clock")}<strong>精选池数据加载中…</strong><p>首次加载约数百 KB，之后 6 小时内走本地缓存。</p></div>`;
+      ensureElitePools();
+      return;
+    }
+    area.innerHTML = eliteState.view === "pool" && eliteState.pool
+      ? elitePoolHTML(eliteState.pool)
+      : eliteOverviewHTML();
+  }
+
+  function applyFundMode() {
+    const isElite = state.dataScope === "elite";
+    const eliteArea = $("#elitePoolsArea");
+    if (eliteArea) eliteArea.hidden = !isElite;
+    const layout = document.querySelector("#fundPage .fund-layout");
+    if (layout) layout.hidden = isElite;
+    const search = $("#allMarketSearch");
+    if (search) search.hidden = false;  // 全市场搜索两种模式下均保留
+    $$("#fundModeSwitch .mode-btn").forEach(btn =>
+      btn.classList.toggle("active", (btn.dataset.fmode === "elite") === isElite));
+    if (isElite) renderElite();
+  }
+
+  // 精选池文案拼接（供复制）
+  function epCopyText(f, poolName, kind) {
+    const m = f.metrics || {};
+    if (kind === "mgr") return `【${f.name}（${f.code}）经理解读】\n${f.manager_view}`;
+    if (kind === "sales") {
+      const sc = f.sales_script || {};
+      return `【${f.name}（${f.code}）对客销售话术 · ${poolName}】\n一句话推介：${sc.opening}\n为什么是现在：${sc.why_now}\n为什么是这只：${sc.why_this}\n怎么持有：${sc.how_hold}\n${sc.risk_tip}`;
+    }
+    return `【${f.name}（${f.code}）营销亮点 · ${poolName}】\n` + (f.highlights || []).map((h, i) => `${i + 1}. ${h}`).join("\n");
+  }
+
+  function eliteDetailHTML(code) {
+    const hit = epFindFund(code);
+    if (!hit) return `<div class="empty-state"><strong>未找到该基金</strong><p>可能已被调出精选池（每日更新）。</p></div>`;
+    const f = hit.fund;
+    const m = f.metrics || {};
+    const pool = eliteState.data.pools[hit.poolId];
+    const poolName = pool ? pool.name : "";
+    const cls = v => (v || 0) > 0 ? "live-up" : "live-down";
+    const sign = v => (v || 0) > 0 ? "+" : "";
+    const metricRow = (label, val, good) => `<div><span>${label}</span><b${good != null ? ` class="${good ? "live-up" : ""}"` : ""}>${val}</b></div>`;
+    return `
+      <div class="fund-hero">
+        <div class="fund-hero-top">
+          <div>
+            <h3>${escapeHTML(f.name)}</h3>
+            <p>${f.code} · ${escapeHTML(f.type || "—")} · ${escapeHTML(f.company || "—")}</p>
+          </div>
+          <div class="ep-hero-badges">
+            <span class="ep-tier-badge ${hit.tier}">${EP_TIER_BADGE[hit.tier]}池</span>
+            <span class="ep-pool-tag ep-${pool.color || "blue"}">${poolName}</span>
+          </div>
+        </div>
+        <div class="fund-metrics">
+          <div><span>单位净值</span><strong>${f.nav != null ? Number(f.nav).toFixed(4) : "—"}</strong></div>
+          <div><span>近1年</span><strong class="${cls(f.y1)}">${f.y1 != null ? sign(f.y1) + epFmt(f.y1, "%") : "—"}</strong></div>
+          <div><span>近3年年化</span><strong>${epFmt(m.ann3, "%")}</strong></div>
+          <div><span>最大回撤(估)</span><strong>${epFmt(m.mdd3, "%")}</strong></div>
+        </div>
+      </div>
+      <div class="source-line">${icon("clock")}净值日期 ${f.nav_date || "—"} · 规模 ${f.scale != null ? epFmt(f.scale, " 亿元") : "—"} · 成立 ${f.est_date || "—"} · 同类排名 ${epRankWord(f.rank_pct)} · 综合分 ${epFmt(f.score)}</div>
+
+      <div class="ep-tabs">
+        <button class="ep-tab active" data-ep-tab="hl">${icon("star")}营销亮点</button>
+        <button class="ep-tab" data-ep-tab="mgr">${icon("user")}经理解读</button>
+        <button class="ep-tab" data-ep-tab="sales">${icon("message")}对客销售话术</button>
+      </div>
+
+      <section class="drawer-section ep-panel" data-ep-panel="hl">
+        <div class="drawer-section-title"><h3>营销亮点</h3><span>规则模板生成 · 用前人工复核</span></div>
+        <ul class="ep-hl-list">${(f.highlights || []).map(h => `<li>${icon("check")}${escapeHTML(h)}</li>`).join("")}</ul>
+        <div class="ep-copy-row"><button class="btn btn-secondary btn-small" data-ep-copy="hl" data-ep-code="${f.code}">${icon("copy")}复制营销亮点</button></div>
+      </section>
+
+      <section class="drawer-section ep-panel" data-ep-panel="mgr" hidden>
+        <div class="drawer-section-title"><h3>经理解读</h3><span>原型模板 · 正式接入需核实任职信息</span></div>
+        <p class="ep-mgr-text">${escapeHTML(f.manager_view || "")}</p>
+        <div class="detail-facts" style="margin-top:10px">
+          ${metricRow("基金公司", escapeHTML(f.company || "—"))}
+          ${metricRow("成立日期", f.est_date || "—")}
+          ${metricRow("运作年限", f.age != null ? f.age + " 年" : "—")}
+          ${metricRow("管理费 / 托管费", `${f.fee_mgmt || "—"} / ${f.fee_custody || "—"}`)}
+        </div>
+        <div class="ep-copy-row"><button class="btn btn-secondary btn-small" data-ep-copy="mgr" data-ep-code="${f.code}">${icon("copy")}复制经理解读</button></div>
+      </section>
+
+      <section class="drawer-section ep-panel" data-ep-panel="sales" hidden>
+        <div class="drawer-section-title"><h3>对客销售话术</h3><span>不构成收益承诺 · 禁止夸大表述</span></div>
+        <div class="ep-script">
+          <div class="ep-script-item"><h5>一句话推介</h5><p>${escapeHTML(f.sales_script.opening)}</p></div>
+          <div class="ep-script-item"><h5>为什么是现在</h5><p>${escapeHTML(f.sales_script.why_now)}</p></div>
+          <div class="ep-script-item"><h5>为什么是这只</h5><p>${escapeHTML(f.sales_script.why_this)}</p></div>
+          <div class="ep-script-item"><h5>怎么持有</h5><p>${escapeHTML(f.sales_script.how_hold)}</p></div>
+        </div>
+        <div class="risk-note" style="margin-top:10px">${escapeHTML(f.sales_script.risk_tip)}</div>
+        <div class="ep-copy-row"><button class="btn btn-secondary btn-small" data-ep-copy="sales" data-ep-code="${f.code}">${icon("copy")}复制完整话术</button></div>
+      </section>
+
+      <section class="drawer-section">
+        <div class="drawer-section-title"><h3>量化指标（估算口径）</h3><span>近3年 · 规则 v${eliteState.data.rule_version || "1.0"}</span></div>
+        <div class="detail-facts">
+          ${metricRow("近3年年化收益", epFmt(m.ann3, "%"), m.ann3 >= (pool.rules.admission[0] ? 8 : 0))}
+          ${metricRow("年化波动率(估)", epFmt(m.vol, "%"))}
+          ${metricRow("最大回撤(估)", epFmt(m.mdd3, "%"))}
+          ${metricRow("近1年回撤(估)", epFmt(m.mdd1, "%"))}
+          ${metricRow("夏普比率(估)", epFmt(m.sharpe))}
+          ${metricRow("卡玛比率(估)", epFmt(m.calmar))}
+          ${metricRow("同类排名(近3年)", epRankWord(f.rank_pct))}
+        </div>
+        <div class="ep-copy-row"><button class="btn btn-primary btn-small" data-ep-copy="all" data-ep-code="${f.code}">${icon("copy")}复制全部内容</button></div>
+      </section>`;
+  }
+
+  function epAllCopyText(code) {
+    const hit = epFindFund(code);
+    if (!hit) return "";
+    const f = hit.fund;
+    const pool = eliteState.data.pools[hit.poolId];
+    const poolName = pool ? pool.name : "";
+    const m = f.metrics || {};
+    return `【${f.name}（${f.code}）· ${poolName} · ${EP_TIER_BADGE[hit.tier]}池】
+基本资料：${f.type} · 成立 ${f.est_date} · 规模 ${f.scale != null ? epFmt(f.scale, " 亿") : "—"} · 管理人 ${f.company}
+核心指标：近3年年化 ${epFmt(m.ann3, "%")}｜最大回撤(估) ${epFmt(m.mdd3, "%")}｜夏普(估) ${epFmt(m.sharpe)}｜同类排名 ${epRankWord(f.rank_pct)}
+
+一、营销亮点
+${(f.highlights || []).map((h, i) => `${i + 1}. ${h}`).join("\n")}
+
+二、经理解读
+${f.manager_view}
+
+三、对客销售话术
+一句话推介：${f.sales_script.opening}
+为什么是现在：${f.sales_script.why_now}
+为什么是这只：${f.sales_script.why_this}
+怎么持有：${f.sales_script.how_hold}
+${f.sales_script.risk_tip}
+
+数据更新：${eliteState.data.generated_at} · 规则版本 ${eliteState.data.rule_version}（原型演示，正式使用须人工复核并经合规确认）`;
+  }
+
   function show() {
     $("#todayPage").hidden = true;
     const marketPage = $("#marketPage");
@@ -1617,6 +1981,7 @@
     $$(".nav-item").forEach(item => item.classList.toggle("active", item.dataset.nav === "fund"));
     document.title = "配基金｜基金智库工作台";
     renderCompareTray();
+    applyFundMode();
     window.scrollTo({ top: 0, behavior: "instant" });
   }
 
@@ -1624,6 +1989,7 @@
     renderFilterPanel();
     syncFilterUI();
     renderResults();
+    applyFundMode();
     bindEvents();
     const pointsBtn = $("#fundPointsBtn");
     if (pointsBtn) pointsBtn.addEventListener("click", () => window.FundThinkTank && window.FundThinkTank.openDrawer("fundPoints", "points"));
@@ -1639,5 +2005,5 @@
   }]));
 
   init();
-  window.FundPicker = { show, detailHTML, compareHTML, pointsHTML, salesHTML, aiDraft, reset: resetAll, library, amsDetailHTML };
+  window.FundPicker = { show, detailHTML, compareHTML, pointsHTML, salesHTML, aiDraft, reset: resetAll, library, amsDetailHTML, eliteDetailHTML };
 })();

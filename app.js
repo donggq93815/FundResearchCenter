@@ -349,6 +349,7 @@
     if (type === "fundPoints" && window.FundPicker) { title = "行业与主题标签判定口径"; eyebrow = "透明规则 · 可配置"; content = backButton() + window.FundPicker.pointsHTML(); }
     if (type === "fundSales" && window.FundPicker) { title = "基金销售一页纸"; eyebrow = "配基金 · AI 辅助起草"; content = backButton() + window.FundPicker.salesHTML(id); }
     if (type === "allMarketFund" && window.FundPicker) { title = "全市场基金详情"; eyebrow = "配基金 · 真实数据"; content = backButton() + window.FundPicker.amsDetailHTML(id); }
+    if (type === "eliteFund" && window.FundPicker) { title = "精选池产品详情"; eyebrow = "四类精选池 · 每日更新"; content = backButton() + window.FundPicker.eliteDetailHTML(id); }
     if (type === "schemeBasis" && window.PortfolioBuilder) { title = "方案计算依据"; eyebrow = "建组合 · 透明规则 · 可配置"; content = backButton() + window.PortfolioBuilder.basisHTML(); }
     if (type === "schemeCompare" && window.PortfolioBuilder) { title = "方案对比"; eyebrow = "建组合 · 最多 3 个方案"; content = backButton() + window.PortfolioBuilder.compareHTML(); }
     if (type === "cltCustomer" && window.CustomerLink) { const c = window.CustomerLink; title = "客户画像卡"; eyebrow = "找客户 · 全景画像 · 演示"; content = backButton() + c.detailHTML(id); }

@@ -277,9 +277,9 @@
       <main class="workspace fund-workspace" id="fundPage" hidden>
         <section class="page-heading fund-page-heading">
           <div>
-            <div class="eyebrow">配基金 · 全市场基金筛选</div>
-            <h1>三步定位候选基金</h1>
-            <p>策略类型 → 交行特色标签 → 行业概念，再用辅助条件收敛到可沟通的产品范围。</p>
+            <div class="eyebrow">配基金 · 四类精选池</div>
+            <h1>从精选池到营销话术，一站式选品</h1>
+            <p>按《四类精选池量化选品规则》每日自动构建进取 / 稳健 / 稳进 / 配置四个产品池，支持查看营销亮点、经理解读与对客销售话术。</p>
           </div>
           <div class="heading-actions">
             <button class="btn btn-secondary" id="fundPointsBtn"><svg><use href="#i-sliders"/></svg>标签判定口径</button>
@@ -287,7 +287,12 @@
           </div>
         </section>
 
-        <div class="demo-notice"><svg><use href="#i-info"/></svg><span>本页为交互原型，基金、净值、业绩与标签均为演示数据；特色标签仅用于流程展示，不构成投资建议。</span></div>
+        <div class="demo-notice"><svg><use href="#i-info"/></svg><span>本页为交互原型：精选池由每日全市场数据按量化规则自动计算，回撤/夏普等风险指标为估算口径；营销亮点、经理解读与销售话术为规则模板生成，正式使用须人工复核并经合规确认。</span></div>
+
+        <div class="fund-mode-switch" id="fundModeSwitch">
+          <button class="mode-btn" data-fmode="elite"><svg aria-hidden="true"><use href="#i-star"/></svg><span class="mode-label">四类精选池<small>每日更新 · 含营销亮点与销售话术</small></span></button>
+          <button class="mode-btn" data-fmode="screen"><svg aria-hidden="true"><use href="#i-grid"/></svg><span class="mode-label">全市场筛选<small>约 2 万只基金 · 多条件筛选</small></span></button>
+        </div>
 
         <section class="card all-market-search" id="allMarketSearch">
           <div class="ams-head">
@@ -295,10 +300,12 @@
             <span class="ams-count" id="amsCount">点击搜索加载</span>
           </div>
           <div class="ams-search-row">
-            <label class="search-field ams-input">${""}<svg><use href="#i-search"/></svg><input id="allFundInput" type="text" placeholder="输入基金名称或 6 位代码，如「易方达消费」或「110022」" autocomplete="off"></label>
+            <label class="search-field ams-input"><svg><use href="#i-search"/></svg><input id="allFundInput" type="text" placeholder="输入基金名称或 6 位代码，如「易方达消费」或「110022」" autocomplete="off"></label>
           </div>
           <div class="ams-results" id="amsResults" hidden></div>
         </section>
+
+        <div id="elitePoolsArea" hidden></div>
 
         <div class="fund-layout">
           <aside class="fund-filter card" id="fundFilter" aria-label="基金筛选条件"></aside>

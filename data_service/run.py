@@ -86,6 +86,8 @@ def main():
                         help="逗号分隔的基金代码（用户正在查看的基金）")
     parser.add_argument("--all", action="store_true",
                         help="同时拉取全市场公募基金列表（约2万只，输出 all_funds.json）")
+    parser.add_argument("--pools", action="store_true",
+                        help="仅重建四类精选池（需已有 all_funds_full.json）")
     args = parser.parse_args()
 
     codes = load_active_codes()
@@ -170,6 +172,20 @@ def run_all_market():
     slim_out = slim_all_market.slim_all_market()
     print("[ok] 精简版 -> %s（%.2f MB）" % (slim_out, os.path.getsize(slim_out) / 1024 / 1024))
 
+    # 四类精选池（规则见《基金四类精选池命名与量化选品规则》）
+    run_elite_pools()
+
+
+def run_elite_pools():
+    """基于全市场数据构建四类精选池（进取/稳健/稳进/配置），输出 elite_pools.json。"""
+    import build_elite_pools
+    print("\n== 构建四类精选池 ==")
+    try:
+        build_elite_pools.build()
+    except Exception as exc:
+        # 精选池构建失败不应阻断主数据流程
+        print("[warn] 精选池构建失败：%s" % exc)
+
 
 def _now():
     import datetime
@@ -178,6 +194,9 @@ def _now():
 
 if __name__ == "__main__":
     import sys
-    main()
-    if "--all" in sys.argv:
-        run_all_market()
+    if "--pools" in sys.argv and "--all" not in sys.argv:
+        run_elite_pools()
+    else:
+        main()
+        if "--all" in sys.argv:
+            run_all_market()
