@@ -18,9 +18,9 @@
   var DATA_RAW_BASE = "https://raw.githubusercontent.com/donggq93815/FundResearchCenter/main";
   var DATA_CDN_BASE = "https://cdn.jsdelivr.net/gh/donggq93815/FundResearchCenter@main";
   var FUNDS_JSON_CANDIDATES = [
-    DATA_RAW_BASE + "/data_service/output/funds.json",
+    "data_service/output/funds.json",
     DATA_CDN_BASE + "/data_service/output/funds.json",
-    "data_service/output/funds.json"
+    DATA_RAW_BASE + "/data_service/output/funds.json"
   ];
   var state = {
     loaded: false,
@@ -57,15 +57,27 @@
   }
 
   /* ---------- 加载 funds.json ---------- */
-  // 依次尝试候选 URL（GitHub 最新 → 本地兜底），任一成功即返回。
+  // 依次尝试候选 URL（同源优先 → CDN → GitHub），任一成功即返回；单源 8 秒超时。
   function load() {
+    function fetchOne(url, ms) {
+      return new Promise(function (resolve, reject) {
+        var ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+        var timer = setTimeout(function () {
+          if (ctl) { try { ctl.abort(); } catch (e) { /* ignore */ } }
+          reject(new Error("timeout"));
+        }, ms || 8000);
+        fetch(url, ctl ? { cache: "no-store", signal: ctl.signal } : { cache: "no-store" })
+          .then(function (r) {
+            if (!r.ok) throw new Error("http " + r.status);
+            return r.json();
+          })
+          .then(function (j) { clearTimeout(timer); resolve(j); })
+          .catch(function (e) { clearTimeout(timer); reject(e); });
+      });
+    }
     function tryNext(urls) {
       if (!urls.length) return Promise.reject(new Error("all sources failed"));
-      return fetch(urls[0], { cache: "no-store" })
-        .then(function (r) {
-          if (!r.ok) throw new Error("http " + r.status);
-          return r.json();
-        })
+      return fetchOne(urls[0], 8000)
         .catch(function () { return tryNext(urls.slice(1)); });
     }
     return tryNext(FUNDS_JSON_CANDIDATES)

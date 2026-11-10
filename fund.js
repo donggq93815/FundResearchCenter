@@ -53,17 +53,30 @@
   const DATA_RAW_BASE = "https://raw.githubusercontent.com/donggq93815/FundResearchCenter/main";
   const DATA_CDN_BASE = "https://cdn.jsdelivr.net/gh/donggq93815/FundResearchCenter@main";
   // 依次尝试多个候选 URL，任一成功即返回；全部失败 reject。
+  /* 单源超时保护：同源/弱网下避免某个源长时间挂起导致页面一直空白 */
+  function fetchWithTimeout(url, opts, ms) {
+    return new Promise((resolve, reject) => {
+      const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+      const timer = setTimeout(() => {
+        if (ctl) { try { ctl.abort(); } catch (e) { /* ignore */ } }
+        reject(new Error("timeout"));
+      }, ms || 8000);
+      fetch(url, ctl ? Object.assign({}, opts, { signal: ctl.signal }) : opts)
+        .then(r => (r.ok ? r.json() : Promise.reject(new Error("http " + r.status))))
+        .then(j => { clearTimeout(timer); resolve(j); })
+        .catch(e => { clearTimeout(timer); reject(e); });
+    });
+  }
   function fetchFirstOk(urls, opts) {
     if (!urls.length) return Promise.reject("no url");
-    return fetch(urls[0], opts).then(r => (r.ok ? r.json() : Promise.reject("http " + r.status)))
-      .catch(() => fetchFirstOk(urls.slice(1), opts));
+    return fetchWithTimeout(urls[0], opts, 8000).catch(() => fetchFirstOk(urls.slice(1), opts));
   }
   const liveData = { loaded: false, byCode: {}, generatedAt: "" };
   (function loadLiveData() {
     fetchFirstOk([
-      DATA_RAW_BASE + "/data_service/output/funds.json",
+      "data_service/output/funds.json",
       DATA_CDN_BASE + "/data_service/output/funds.json",
-      "data_service/output/funds.json"
+      DATA_RAW_BASE + "/data_service/output/funds.json"
     ], { cache: "no-store" })
       .then(j => {
         liveData.loaded = true;
@@ -1679,9 +1692,9 @@
     if (loadEliteFromCache()) {
       // 后台再验证：缓存先渲染，若远端 rule_version/generated_at 有更新则自动刷新
       fetchFirstOk([
-        DATA_RAW_BASE + "/data_service/output/elite_pools.json",
+        "data_service/output/elite_pools.json",
         DATA_CDN_BASE + "/data_service/output/elite_pools.json",
-        "data_service/output/elite_pools.json"
+        DATA_RAW_BASE + "/data_service/output/elite_pools.json"
       ], { cache: "no-store" })
         .then(j => {
           if (!j || !j.pools) return;
@@ -1697,9 +1710,9 @@
     }
     eliteState.loading = true;  // 缓存未命中时继续网络加载
     fetchFirstOk([
-      DATA_RAW_BASE + "/data_service/output/elite_pools.json",
+      "data_service/output/elite_pools.json",
       DATA_CDN_BASE + "/data_service/output/elite_pools.json",
-      "data_service/output/elite_pools.json"
+      DATA_RAW_BASE + "/data_service/output/elite_pools.json"
     ], { cache: "no-store" })
       .then(j => {
         try {

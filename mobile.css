@@ -1,0 +1,568 @@
+@charset "UTF-8";
+/* =========================================================================
+   基金智库 · 移动端适配层
+   -------------------------------------------------------------------------
+   本文件在所有页面样式之后加载，专门收敛窄屏体验，不改动原有桌面样式。
+   断点约定：
+     1024px  平板横屏：网格与内边距收紧
+      860px  进入移动布局：底部 Tab、汉堡菜单、侧栏抽屉化、表格横滚
+      560px  小屏手机：单列化、字号与留白进一步压缩
+      380px  极小屏：兜底
+   ========================================================================= */
+
+:root {
+  --m-tabbar-h: 58px;
+  --m-topbar-h: 56px;
+  --m-safe-b: env(safe-area-inset-bottom, 0px);
+  --m-safe-t: env(safe-area-inset-top, 0px);
+}
+
+/* ------------------------------------------------------------------ *
+ * 1. 全局基础
+ * ------------------------------------------------------------------ */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  overflow-x: hidden;
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 触屏设备去掉 hover 粘滞效果（保留 active 高亮） */
+@media (hover: none) {
+  .fund-table tbody tr:hover,
+  .ep-table tbody tr:hover,
+  .clickable-list-item:hover {
+    background: inherit;
+  }
+  .nav-item:hover:not(.active) { background: transparent; color: inherit; }
+  .ep-pool-card:hover {
+    border-color: var(--line);
+    box-shadow: none;
+    transform: none;
+  }
+}
+/* 所有横向滚动容器启用惯性滚动 */
+.fund-table-wrap,
+.ep-table-wrap,
+.clt-table-wrap,
+.cp-table-wrap,
+.cp-univ-table-wrap,
+.indicator-table-wrap,
+.comparison-table-wrap,
+.pf-table-wrap,
+.task-tabs,
+.fund-filter,
+.ams-results,
+.drawer-content {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ------------------------------------------------------------------ *
+ * 2. 移动端专属元素（桌面默认隐藏）
+ * ------------------------------------------------------------------ */
+.m-menu-btn { display: none; }
+.m-tabbar { display: none; }
+.m-scrim { position: fixed; inset: 0; z-index: 90; background: rgba(8, 22, 40, .46); }
+
+/* ------------------------------------------------------------------ *
+ * 3. 平板横向 1024px
+ * ------------------------------------------------------------------ */
+@media (max-width: 1024px) {
+  .workspace { padding-left: 18px; padding-right: 18px; }
+  .ep-pool-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .pf-customer-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .cp-kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ------------------------------------------------------------------ *
+ * 4. 移动布局 860px —— 核心断点
+ * ------------------------------------------------------------------ */
+@media (max-width: 860px) {
+  /* ---- 4.1 侧栏改为抽屉 ---- */
+  .sidebar {
+    display: flex !important;          /* 覆盖 580px 的 display:none */
+    width: 272px;
+    max-width: 84vw;
+    padding: 0 14px;
+    padding-top: var(--m-safe-t);
+    z-index: 95;
+    transform: translateX(-100%);
+    transition: transform .26s cubic-bezier(.32, .72, 0, 1);
+    will-change: transform;
+  }
+  body.m-sidebar-open .sidebar {
+    transform: translateX(0);
+    box-shadow: 14px 0 44px rgba(6, 20, 38, .34);
+  }
+  .brand { justify-content: flex-start; padding: 0 9px; height: calc(64px + var(--m-safe-t)); }
+  .brand > div:last-child { display: block; }
+  .workspace-label { display: block; }
+  .nav-item { justify-content: flex-start; padding: 0 13px; height: 46px; }
+  .nav-item span { display: inline; }
+  .ai-nav-card { display: block; }
+  .user-meta { display: flex; }
+  .sidebar-footer { justify-content: flex-start; }
+  .sidebar-footer > svg { display: block; }
+  .main-shell { width: 100% !important; margin-left: 0 !important; }
+
+  /* ---- 4.2 顶部栏压缩 ---- */
+  .topbar {
+    height: var(--m-topbar-h);
+    padding: 0 10px;
+    padding-top: var(--m-safe-t);
+    height: calc(var(--m-topbar-h) + var(--m-safe-t));
+    gap: 6px;
+    justify-content: flex-start;
+  }
+  .m-menu-btn { display: inline-grid; width: 38px; height: 38px; flex-shrink: 0; }
+  .m-menu-btn svg { width: 21px; height: 21px; }
+  .global-search {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    justify-content: center;
+    background: transparent;
+    border-color: transparent;
+    flex-shrink: 0;
+  }
+  .global-search span,
+  .global-search kbd { display: none; }
+  .global-search svg { width: 20px; height: 20px; }
+  .topbar-right { gap: 0; margin-left: auto; }
+  .topbar-divider,
+  .environment-badge,
+  .today-label { display: none; }
+  .icon-btn { width: 38px; height: 38px; }
+  .notification-panel {
+    position: fixed;
+    top: calc(var(--m-topbar-h) + var(--m-safe-t) + 4px);
+    right: 10px;
+    left: 10px;
+    width: auto;
+  }
+
+  /* ---- 4.3 底部 Tab Bar ---- */
+  .m-tabbar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 82;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    height: calc(var(--m-tabbar-h) + var(--m-safe-b));
+    padding: 0 2px var(--m-safe-b);
+    background: rgba(255, 255, 255, .97);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -2px 14px rgba(16, 40, 70, .06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .m-tabbar .nav-item {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    padding: 5px 0 3px;
+    color: var(--ink-500);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+  .m-tabbar .nav-item svg { width: 21px; height: 21px; stroke-width: 1.7; }
+  .m-tabbar .nav-item span {
+    display: block;
+    flex: none;
+    color: inherit;
+    font-size: 10px;
+    line-height: 1.2;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+  .m-tabbar .nav-item.active {
+    color: var(--brand-600);
+    background: transparent;
+    box-shadow: none;
+  }
+  .m-tabbar .nav-item.active svg { stroke-width: 2.1; }
+  .m-tabbar .nav-item.active::before {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 20px;
+    height: 2.5px;
+    background: var(--brand-600);
+    border-radius: 0 0 3px 3px;
+    transform: translateX(-50%);
+    content: "";
+  }
+
+  /* ---- 4.4 内容区留白与排版 ---- */
+  .workspace,
+  .fund-workspace,
+  .market-workspace,
+  .pf-workspace,
+  .clt-workspace,
+  .companion-workspace {
+    padding: 16px 12px calc(var(--m-tabbar-h) + var(--m-safe-b) + 22px);
+    max-width: 100%;
+  }
+  .page-heading {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .page-heading h1 { font-size: 20px; line-height: 1.4; letter-spacing: -.2px; }
+  .page-heading p { margin-top: 5px; font-size: 12px; line-height: 1.65; }
+  .heading-actions { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .heading-actions .btn {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+    padding: 8px 10px;
+    line-height: 1.3;
+    white-space: normal;
+    text-align: center;
+  }
+  /* 按钮数为奇数时，最后一个占满整行，避免右侧留空 */
+  .heading-actions .btn:nth-child(odd):last-child { flex-basis: 100%; }
+  .eyebrow { font-size: 10px; letter-spacing: 1px; }
+
+  /* 触控目标不小于 40px */
+  .btn { min-height: 40px; padding: 0 13px; font-size: 13px; }
+  .btn-sm,
+  .link-btn { min-height: 32px; }
+  .icon-btn,
+  .filter-reset { min-width: 32px; min-height: 32px; }
+
+  /* 输入控件 16px 防止 iOS 聚焦时页面缩放 */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  input[type="range"] { min-height: 28px; }
+
+  .demo-notice { font-size: 11px; line-height: 1.7; }
+
+  /* 任务筛选标签：横向滚动，不换行不挤压 */
+  .task-tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .task-tabs::-webkit-scrollbar { display: none; }
+  .task-tabs button {
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* ---- 4.5 卡片与网格 ---- */
+  .card { border-radius: 12px; }
+  .content-grid,
+  .right-column { grid-template-columns: 1fr !important; }
+  /* 四张摘要卡改为 2×2，保留图标，信息更紧凑 */
+  .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .summary-card { min-height: 0; padding: 12px; gap: 9px; }
+  .summary-icon { display: grid; width: 34px; height: 34px; border-radius: 9px; }
+  .summary-icon svg { width: 17px; height: 17px; }
+  .summary-label { font-size: 11px; line-height: 1.35; }
+  .summary-content { grid-template-columns: minmax(0, 1fr); row-gap: 3px; }
+  .summary-value { grid-row: auto; grid-column: 1; font-size: 21px; }
+  .summary-note { display: none; }
+  .summary-arrow { display: none; }
+
+  /* ---- 4.6 表格横向滚动 ---- */
+  .fund-table-wrap,
+  .ep-table-wrap,
+  .clt-table-wrap,
+  .cp-table-wrap,
+  .cp-univ-table-wrap,
+  .indicator-table-wrap,
+  .comparison-table-wrap,
+  .pf-table-wrap {
+    position: relative;
+    border-radius: 10px;
+  }
+  .fund-table { min-width: 660px; }
+  .ep-table { min-width: 600px; }
+  .clt-table,
+  .cp-table { min-width: 640px; }
+  .cp-univ-table,
+  .indicator-table,
+  .comparison-table,
+  .pf-table { min-width: 560px; }
+  .pf-basis-table { min-width: 460px; }
+  .cmp-table,
+  .points-table { min-width: 100%; }
+  /* 右侧渐隐提示还有更多列 */
+  .fund-table-wrap::after,
+  .ep-table-wrap::after,
+  .clt-table-wrap::after,
+  .cp-table-wrap::after {
+    position: sticky;
+    right: 0;
+    display: block;
+    width: 18px;
+    height: 100%;
+    margin-top: -100%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .92));
+    pointer-events: none;
+    content: "";
+  }
+  .fund-table th,
+  .ep-table th,
+  .clt-table th,
+  .cp-table th { font-size: 11px; }
+  .fund-table td,
+  .ep-table td,
+  .clt-table td,
+  .cp-table td { font-size: 12px; }
+
+  /* ---- 4.7 基金页 ---- */
+  .fund-mode-switch { gap: 8px; }
+  .fund-mode-switch .mode-btn { padding: 11px 12px; gap: 8px; }
+  .fund-mode-switch .mode-btn .mode-label { font-size: 13px; }
+  .fund-mode-switch .mode-btn .mode-label small { font-size: 10px; line-height: 1.35; }
+  .all-market-search { padding: 14px; }
+  .ams-head { flex-direction: column; gap: 8px; }
+  .ams-count { align-self: flex-start; min-height: 34px; display: inline-flex; align-items: center; padding: 0 14px; }
+  .ams-input { min-height: 46px; }
+  .ams-results { max-height: 60vh; }
+  .ams-item { padding: 12px 12px; }
+  .fund-layout { grid-template-columns: 1fr; gap: 12px; }
+  /* 筛选面板在手机上默认收起，点击头部展开（由 mobile.js 控制） */
+  .fund-filter {
+    position: static;
+    max-height: none;
+    overflow: hidden;
+    transition: max-height .28s ease, box-shadow .2s;
+  }
+  .fund-filter .filter-head { cursor: pointer; border-radius: 12px; }
+  .fund-filter .filter-head::after {
+    width: 8px;
+    height: 8px;
+    margin-left: 2px;
+    border-right: 2px solid var(--ink-500);
+    border-bottom: 2px solid var(--ink-500);
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform .2s;
+    content: "";
+    flex-shrink: 0;
+  }
+  body.m-filter-open .fund-filter { max-height: 68vh; max-height: 68dvh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+  body.m-filter-open .fund-filter .filter-head { position: sticky; border-radius: 12px 12px 0 0; }
+  body.m-filter-open .fund-filter .filter-head::after { transform: rotate(225deg) translateY(-2px); }
+  body:not(.m-filter-open) .fund-filter .filter-head { border-bottom: 0; }
+  body:not(.m-filter-open) .fund-filter > *:not(.filter-head) { display: none; }
+  .fund-toolbar { padding: 10px 12px; }
+  .fund-cards { grid-template-columns: 1fr; }
+  .ep-overview { padding: 14px; }
+  .ep-pool-grid { grid-template-columns: 1fr; gap: 10px; }
+  .ep-pool-stats { grid-template-columns: repeat(2, 1fr); }
+  .ep-rules { grid-template-columns: 1fr; }
+  .ep-pool-card { padding: 14px; }
+
+  /* 对比托盘抬到底部 Tab 之上 */
+  .compare-tray {
+    left: 10px;
+    right: 10px;
+    bottom: calc(var(--m-tabbar-h) + var(--m-safe-b) + 8px);
+  }
+  .compare-tray-inner { flex-wrap: wrap; gap: 8px; padding: 9px 11px; }
+  .tray-chips { order: 3; width: 100%; flex: 1 1 100%; max-height: 62px; overflow-y: auto; }
+  .tray-chip { max-width: 100%; }
+
+  /* ---- 4.8 详情抽屉全屏 ---- */
+  .detail-drawer {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+  }
+  .drawer-header {
+    min-height: 62px;
+    padding: 14px 16px;
+    padding-top: calc(14px + var(--m-safe-t));
+  }
+  .drawer-header h2 { font-size: 16px; }
+  .drawer-content { padding: 16px 16px calc(24px + var(--m-safe-b)); }
+  .detail-grid { grid-template-columns: 1fr 1fr; }
+  .drawer-actions {
+    position: sticky;
+    bottom: 0;
+    margin-top: 18px;
+    padding: 12px 0 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0), #fff 28%);
+  }
+  .drawer-actions .btn { min-height: 44px; }
+  .fund-metrics strong { font-size: 15px; }
+
+  /* ---- 4.9 弹窗 ---- */
+  .drawer-overlay,
+  .modal-overlay,
+  .search-overlay { padding: 0; }
+  .briefing-modal,
+  .form-modal,
+  .pf-modal,
+  .clt-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    max-height: 92dvh;
+    border-radius: 16px 16px 0 0;
+  }
+  .modal-overlay,
+  .clt-modal-overlay { align-items: flex-end; place-items: end center; padding: 0; }
+  .search-overlay { align-items: flex-start; }
+  .search-modal { width: 100%; max-width: 100%; margin: 0 10px; margin-top: calc(var(--m-topbar-h) + var(--m-safe-t)); border-radius: 14px; }
+  .modal-body,
+  .pf-modal-body,
+  .briefing-document { padding-left: 16px; padding-right: 16px; }
+  .modal-footer {
+    padding: 12px 16px calc(12px + var(--m-safe-b));
+    gap: 8px;
+  }
+  .modal-footer .btn { flex: 1; min-height: 44px; }
+
+  /* ---- 4.10 Toast 避让 ---- */
+  .toast-container {
+    right: 12px;
+    bottom: calc(var(--m-tabbar-h) + var(--m-safe-b) + 84px);
+    left: 12px;
+    align-items: stretch;
+  }
+  .toast { width: 100%; }
+
+  /* ---- 4.11 实时行情条（看市场页） ---- */
+  .ds-live-bar { padding: 10px 12px; gap: 10px; margin: 10px 0; }
+  .ds-live-left { gap: 8px; }
+  .ds-live-src, .ds-live-time { font-size: 11px; }
+  .ds-live-indexes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+    width: 100%;
+  }
+  .ds-idx {
+    min-width: 0;
+    justify-content: space-between;
+    gap: 4px;
+    font-size: 12px;
+  }
+  .ds-idx-name {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 12px;
+    text-overflow: ellipsis;
+  }
+  .ds-idx-price, .ds-idx-pct { font-size: 12px; white-space: nowrap; }
+  .ds-idx-row { gap: 8px; }
+  .ds-idx-row-name { width: 58px; font-size: 12px; }
+
+  /* ---- 4.12 其他页面的窄屏收敛 ---- */
+  .pf-customer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pf-customer-bar { flex-direction: column; align-items: stretch; gap: 8px; padding: 12px; }
+  .pf-section .card-header.compact {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 13px 14px;
+  }
+  .pf-search { min-width: 0; width: 100%; height: 42px; }
+  .pf-search input { font-size: 16px !important; }
+  .pf-profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pf-scheme-grid,
+  .pf-diag-top,
+  .pf-diag-facts,
+  .pf-market-panel,
+  .pf-exp-grid { grid-template-columns: 1fr; }
+  .pf-fund-row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; }
+  .clt-op-grid,
+  .clt-lanes,
+  .clt-board-grid,
+  .clt-f-grid { grid-template-columns: 1fr; }
+  .clt-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cp-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .cp-kpi { padding: 12px; gap: 4px; }
+  .cp-kpi b { font-size: 19px; }
+  .cp-kpi:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .cp-rules-grid,
+  .cp-lanes,
+  .cp-cust-grid,
+  .cp-attri-items,
+  .cp-seg-grid,
+  .cp-gain-grid,
+  .cp-facts { grid-template-columns: 1fr; }
+  .market-snapshot { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------------ *
+ * 5. 小屏手机 560px
+ * ------------------------------------------------------------------ */
+@media (max-width: 560px) {
+  .workspace { padding-left: 10px; padding-right: 10px; }
+  .page-heading h1 { font-size: 18px; }
+  .page-heading p { font-size: 11.5px; }
+  .m-tabbar .nav-item span { font-size: 9.5px; }
+  .m-tabbar .nav-item svg { width: 20px; height: 20px; }
+
+  .summary-card { padding: 11px 12px; }
+  .summary-value { font-size: 20px; }
+  .task-item { padding: 12px 12px; }
+
+  .fund-mode-switch { gap: 7px; }
+  .fund-mode-switch .mode-btn { padding: 10px; gap: 7px; }
+  .fund-mode-switch .mode-btn .mode-label { font-size: 12px; }
+  .fund-mode-switch .mode-btn .mode-label small { display: none; }
+  .ep-pool-stats { grid-template-columns: repeat(2, 1fr); }
+  .ep-pool-card { padding: 13px; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .fund-metrics { margin-top: 14px; }
+
+  .drawer-header { padding: 12px 13px calc(12px + 0px); padding-top: calc(12px + var(--m-safe-t)); }
+  .drawer-content { padding: 14px 13px calc(20px + var(--m-safe-b)); }
+  .modal-body,
+  .pf-modal-body,
+  .briefing-document { padding-left: 13px; padding-right: 13px; }
+
+  .pf-customer-grid,
+  .pf-profile-grid,
+  .clt-facts { grid-template-columns: 1fr; }
+  .pf-donut-wrap { grid-template-columns: 1fr; }
+  .cp-gain-grid { grid-template-columns: 1fr; }
+  .cmp-table,
+  .points-table { font-size: 11px; }
+}
+
+/* ------------------------------------------------------------------ *
+ * 6. 极小屏 380px
+ * ------------------------------------------------------------------ */
+@media (max-width: 380px) {
+  .m-tabbar .nav-item span { font-size: 9px; }
+  .m-tabbar .nav-item svg { width: 19px; height: 19px; }
+  .page-heading h1 { font-size: 17px; }
+  .heading-actions .btn { padding: 8px 6px; font-size: 12px; }
+  .fund-table { min-width: 600px; }
+}
+
+/* ------------------------------------------------------------------ *
+ * 7. 横屏矮视口（手机横放）
+ * ------------------------------------------------------------------ */
+@media (max-width: 900px) and (max-height: 460px) and (orientation: landscape) {
+  .sidebar { width: 230px; }
+  .brand { height: 56px; }
+  .workspace-label { padding: 12px 13px 6px; }
+  .ai-nav-card { display: none; }
+  .sidebar-footer { min-height: 56px; }
+  .drawer-actions { position: static; }
+}

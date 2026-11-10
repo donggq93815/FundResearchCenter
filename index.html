@@ -2,8 +2,12 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="基金智库工作台——面向客户经理的一站式公募基金展业工具原型">
+  <meta name="theme-color" content="#0f2f4f">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>今日工作｜基金智库工作台</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
@@ -13,6 +17,7 @@
   <link rel="stylesheet" href="customer.css">
   <link rel="stylesheet" href="companion.css">
   <link rel="stylesheet" href="data_source_badge.css">
+  <link rel="stylesheet" href="mobile.css">
 </head>
 <body>
   <svg class="svg-sprite" aria-hidden="true">
@@ -60,7 +65,7 @@
   </svg>
 
   <div class="app-shell">
-    <aside class="sidebar">
+    <aside class="sidebar" id="appSidebar" aria-label="侧边导航">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
         <div><div class="brand-name">基金智库</div><div class="brand-sub">交行客户经理工作台</div></div>
@@ -90,6 +95,7 @@
 
     <div class="main-shell">
       <header class="topbar">
+        <button class="icon-btn m-menu-btn" id="mobileMenuBtn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="appSidebar"><svg><use href="#i-list"/></svg></button>
         <button class="global-search" id="globalSearchBtn" aria-label="打开全局搜索">
           <svg><use href="#i-search"/></svg><span>搜索客户、基金、组合或任务</span><kbd>Ctrl K</kbd>
         </button>
@@ -486,6 +492,18 @@
   </div>
 
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- 移动端底部导航 -->
+  <nav class="m-tabbar" id="mobileTabbar" aria-label="移动端主导航">
+    <button class="nav-item m-tab active" data-nav="today" type="button"><svg aria-hidden="true"><use href="#i-grid"/></svg><span>今日</span></button>
+    <button class="nav-item m-tab" data-nav="market" type="button"><svg aria-hidden="true"><use href="#i-market"/></svg><span>市场</span></button>
+    <button class="nav-item m-tab" data-nav="fund" type="button"><svg aria-hidden="true"><use href="#i-fund"/></svg><span>配基金</span></button>
+    <button class="nav-item m-tab" data-nav="portfolio" type="button"><svg aria-hidden="true"><use href="#i-portfolio"/></svg><span>建组合</span></button>
+    <button class="nav-item m-tab" data-nav="companion" type="button"><svg aria-hidden="true"><use href="#i-heart"/></svg><span>陪持有</span></button>
+    <button class="nav-item m-tab" data-nav="customer" type="button"><svg aria-hidden="true"><use href="#i-users"/></svg><span>找客户</span></button>
+  </nav>
+  <div class="m-scrim" id="mobileScrim" hidden></div>
+
   <script src="app.js" charset="utf-8"></script>
   <script src="market.js" charset="utf-8"></script>
   <script src="fund.js" charset="utf-8"></script>
@@ -493,5 +511,6 @@
   <script src="customer.js" charset="utf-8"></script>
   <script src="companion.js" charset="utf-8"></script>
   <script src="data_source_badge.js" charset="utf-8"></script>
+  <script src="mobile.js" charset="utf-8"></script>
 </body>
 </html>
