@@ -1676,7 +1676,25 @@
   function ensureElitePools() {
     if (eliteState.loaded || eliteState.loading) return;
     eliteState.loading = true;
-    if (loadEliteFromCache()) return;
+    if (loadEliteFromCache()) {
+      // 后台再验证：缓存先渲染，若远端 rule_version/generated_at 有更新则自动刷新
+      fetchFirstOk([
+        DATA_RAW_BASE + "/data_service/output/elite_pools.json",
+        DATA_CDN_BASE + "/data_service/output/elite_pools.json",
+        "data_service/output/elite_pools.json"
+      ], { cache: "no-store" })
+        .then(j => {
+          if (!j || !j.pools) return;
+          if (eliteState.data && j.rule_version === eliteState.data.rule_version
+              && j.generated_at === eliteState.data.generated_at) return;
+          try {
+            localStorage.setItem(EP_CACHE_KEY, JSON.stringify({ ts: Date.now(), ...j }));
+          } catch (e) { /* 缓存超限时静默忽略 */ }
+          applyEliteData(j);
+        })
+        .catch(() => {});
+      return;
+    }
     eliteState.loading = true;  // 缓存未命中时继续网络加载
     fetchFirstOk([
       DATA_RAW_BASE + "/data_service/output/elite_pools.json",
@@ -1719,6 +1737,16 @@
     if (rp === null || rp === undefined) return "—";
     const p = Math.max(1, Math.round(rp * 100));
     return "前 " + p + "%";
+  }
+
+  function epQualityNote(pool) {
+    const st = (pool && pool.stats) || {};
+    const all = ((pool && pool.core) || []).length + ((pool && pool.observe) || []).length;
+    const real = st.real_metrics_count;
+    if (real === null || real === undefined) return "风险指标口径见池总览说明；";
+    if (all > 0 && real >= all) return "风险指标基于近3年日频复权净值真实计算（含分红再投）；";
+    if (real > 0) return `风险指标 ${real}/${all} 只基于真实净值计算，其余为估算口径；`;
+    return "风险指标为估算口径（见池总览说明）；";
   }
 
   function eliteOverviewHTML() {
@@ -1796,7 +1824,7 @@
           <div class="ep-detail-stats">
             <div><span>通用门槛通过</span><b>${s.gate_pass != null ? s.gate_pass : "—"} 只</b></div>
             <div><span>量化准入通过</span><b>${s.admission_pass != null ? s.admission_pass : "—"} 只</b></div>
-            <div><span>平均夏普（估）</span><b>${s.avg_sharpe != null ? epFmt(s.avg_sharpe) : "—"}</b></div>
+            <div><span>平均夏普</span><b>${s.avg_sharpe != null ? epFmt(s.avg_sharpe) : "—"}</b></div>
           </div>
         </div>
         <div class="ep-rules">
@@ -1811,11 +1839,11 @@
         </div>
         <div class="ep-table-wrap">
           <table class="ep-table">
-            <thead><tr><th>#</th><th>基金</th><th>分级</th><th>规模</th><th>近1年</th><th>近3年年化</th><th>最大回撤(估)</th><th>夏普(估)</th><th>同类排名</th><th>综合分</th></tr></thead>
+            <thead><tr><th>#</th><th>基金</th><th>分级</th><th>规模</th><th>近1年</th><th>近3年年化</th><th>最大回撤</th><th>夏普</th><th>同类排名</th><th>综合分</th></tr></thead>
             <tbody>${tableRows || `<tr><td colspan="10" class="ep-empty">当前分级暂无产品</td></tr>`}</tbody>
           </table>
         </div>
-        <div class="ep-meta-note">${icon("info")}风险指标为估算口径（见池总览说明）；池内产品按综合分排序，综合分 = 收益 30% + 夏普 25% + 卡玛 20% + 回撤 15% + 排名 10%。</div>
+        <div class="ep-meta-note">${icon("info")}${escapeHTML(epQualityNote(pool))}池内产品按综合分排序，综合分 = 收益 30% + 夏普 25% + 卡玛 20% + 回撤 15% + 排名 10%。</div>
       </section>`;
   }
 
@@ -1926,14 +1954,14 @@
       </section>
 
       <section class="drawer-section">
-        <div class="drawer-section-title"><h3>量化指标（估算口径）</h3><span>近3年 · 规则 v${eliteState.data.rule_version || "1.0"}</span></div>
+        <div class="drawer-section-title"><h3>量化指标（${f.metrics_quality === "real" ? "真实净值计算" : "估算口径"}）</h3><span>近3年 · 规则 v${eliteState.data.rule_version || "1.0"}</span></div>
         <div class="detail-facts">
           ${metricRow("近3年年化收益", epFmt(m.ann3, "%"), m.ann3 >= (pool.rules.admission[0] ? 8 : 0))}
-          ${metricRow("年化波动率(估)", epFmt(m.vol, "%"))}
-          ${metricRow("最大回撤(估)", epFmt(m.mdd3, "%"))}
-          ${metricRow("近1年回撤(估)", epFmt(m.mdd1, "%"))}
-          ${metricRow("夏普比率(估)", epFmt(m.sharpe))}
-          ${metricRow("卡玛比率(估)", epFmt(m.calmar))}
+          ${metricRow("年化波动率" + (f.metrics_quality === "real" ? "" : "（估）"), epFmt(m.vol, "%"))}
+          ${metricRow("最大回撤" + (f.metrics_quality === "real" ? "" : "（估）"), epFmt(m.mdd3, "%"))}
+          ${metricRow("近1年回撤" + (f.metrics_quality === "real" ? "" : "（估）"), epFmt(m.mdd1, "%"))}
+          ${metricRow("夏普比率" + (f.metrics_quality === "real" ? "" : "（估）"), epFmt(m.sharpe))}
+          ${metricRow("卡玛比率" + (f.metrics_quality === "real" ? "" : "（估）"), epFmt(m.calmar))}
           ${metricRow("同类排名(近3年)", epRankWord(f.rank_pct))}
         </div>
         <div class="ep-copy-row"><button class="btn btn-primary btn-small" data-ep-copy="all" data-ep-code="${f.code}">${icon("copy")}复制全部内容</button></div>

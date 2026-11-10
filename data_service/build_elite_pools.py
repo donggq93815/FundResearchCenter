@@ -8,11 +8,12 @@
   - 稳进增强池（固收+）：低波底仓上争取小幅增强，重点筛选回撤与性价比
   - 多元配置池（FOF）：二次分散与资产再平衡，重点筛选大类资产配置能力
 
-数据口径说明（原型）：
+数据口径说明（v1.1）：
   - 成立年限 / 规模 / 区间收益 / 类型 / 费率：来自东方财富真实数据
   - 同类排名百分位：按同类型基金近 3 年收益真实排名计算
-  - 最大回撤 / 波动率 / 夏普 / 卡玛：东财列表接口不提供，用区间收益锚点
-    插值出的近似净值序列估算（确定性算法，同输入同输出），前端统一标注"估算"
+  - 最大回撤 / 波动率 / 夏普 / 卡玛：拉取东财日频历史净值（pingzhongdata，
+    equityReturn 分红再投口径）复利构造复权净值后真实计算；估算指标仅用于
+    初筛排序与净值拉取失败时的兜底（该产品标注 metrics_quality=estimated）
   - 基金经理任职年限 / 合规记录 / 持仓集中度：暂无数据源，不参与筛选，见 meta.skipped_rules
 """
 
@@ -21,11 +22,15 @@ import hashlib
 import json
 import math
 import os
+import re
 import sys
+import time
+
+import requests
 
 import config
 
-RULE_VERSION = "v1.0"
+RULE_VERSION = "v1.1"
 
 # 池定义（名称/定位来自规则文档第一节）
 POOL_DEFS = {
@@ -277,6 +282,89 @@ def estimate_risk(fund):
         "sharpe": round(sharpe, 2),
         "calmar": round(calmar, 2),
     }
+
+
+# ---------------------------------------------------------------- 真实历史净值与风险指标
+
+_NAV_URL = "https://fund.eastmoney.com/pingzhongdata/{code}.js"
+_NAV_HEADERS = {
+    "Referer": "https://fund.eastmoney.com/{code}.html",
+    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                   "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"),
+}
+NAV_FETCH_LIMIT = 100     # 每池拉取真实净值的候选数量上限（核心20+观察30，留重校验剔除余量）
+NAV_MIN_POINTS = 400      # 近3年复权净值点数下限（约730个交易日，容忍少量缺失）
+NAV_ABORT_STREAK = 15     # 连续失败达该数量后中止真实净值阶段（防数据源整体故障拖垮 CI）
+NAV_THROTTLE = 0.10       # 相邻请求间隔（秒），避免触发数据源风控
+
+
+def fetch_real_nav(code, now=None, retries=1):
+    """
+    拉取近 3 年日频复权净值序列（时间正序）。
+    数据源为东财 pingzhongdata：单请求即含全部历史净值；equityReturn 为含分红
+    的日增长率，复利累积得到分红再投的复权净值。失败返回 None（调用方回退估算）。
+    """
+    if now is None:
+        now = datetime.datetime.now()
+    t0_ms = (now - datetime.timedelta(days=int(365.25 * 3) + 10)).timestamp() * 1000
+    headers = {
+        "Referer": _NAV_HEADERS["Referer"].format(code=code),
+        "User-Agent": _NAV_HEADERS["User-Agent"],
+    }
+    for attempt in range(retries + 1):
+        try:
+            r = requests.get(_NAV_URL.format(code=code), headers=headers, timeout=12)
+            if r.status_code != 200:
+                raise RuntimeError("HTTP %s" % r.status_code)
+            m = re.search(r"Data_netWorthTrend\s*=\s*(\[.*?\]);", r.text)
+            if not m:
+                raise RuntimeError("netWorthTrend missing")
+            pts = [p for p in json.loads(m.group(1)) if p.get("x", 0) >= t0_ms]
+            if len(pts) < NAV_MIN_POINTS:
+                return None
+            nav, series = 1.0, []
+            for p in pts:
+                er = p.get("equityReturn")
+                nav *= 1.0 + (float(er) if er not in (None, "") else 0.0) / 100.0
+                series.append(nav)
+            return series
+        except Exception:
+            if attempt < retries:
+                time.sleep(0.6)
+    return None
+
+
+def calc_real_metrics(nav_series):
+    """由复权净值序列计算真实风险指标（字段与单位同 estimate_risk，不含 _pool）。"""
+    n = len(nav_series)
+    if n < NAV_MIN_POINTS:
+        return None
+    total = nav_series[-1] / nav_series[0]
+    if total <= 0:
+        return None
+    ann3 = (math.pow(total, 252.0 / (n - 1)) - 1.0) * 100.0
+    rets = [nav_series[i] / nav_series[i - 1] - 1.0 for i in range(1, n)]
+    mean = sum(rets) / len(rets)
+    var = sum((x - mean) ** 2 for x in rets) / (len(rets) - 1)
+    vol = math.sqrt(var) * math.sqrt(252.0) * 100.0
+    if vol < 0.05:
+        vol = 0.05
+
+    def _mdd(series):
+        peak, mdd = series[0], 0.0
+        for v in series:
+            if v > peak:
+                peak = v
+            if peak > 0:
+                mdd = max(mdd, (peak - v) / peak)
+        return mdd * 100.0
+
+    mdd3 = _mdd(nav_series)
+    mdd1 = _mdd(nav_series[-252:]) if n > 60 else mdd3
+    sharpe = (ann3 - 2.0) / vol
+    calmar = ann3 / mdd3 if mdd3 > 0.01 else (99.0 if ann3 > 0 else 0.0)
+    return {"ann3": round(ann3, 2), "vol": round(vol, 2), "mdd3": round(mdd3, 2),
+            "mdd1": round(mdd1, 2), "sharpe": round(sharpe, 2), "calmar": round(calmar, 2)}
 
 
 # ---------------------------------------------------------------- 排名与归类
@@ -537,8 +625,46 @@ def build():
 
     pools = {}
     total_core = total_obs = 0
+    nav_total = nav_ok = nav_fail = 0
     for pid, POOL in POOL_DEFS.items():
+        rules = POOL_RULES[pid]
         lst = sorted(candidates[pid], key=lambda x: (x["tier"] != "core", -x["score"]))
+
+        # ---- 阶段 2：拉取真实历史净值，重算风险指标并重校验准入/优选 ----
+        # 阶段 1 的估算指标仅用于初筛排序；净值拉取失败的基金回退估算并标注 estimated。
+        kept = []
+        fail_streak = 0
+        for rec in lst[:NAV_FETCH_LIMIT]:
+            if fail_streak >= NAV_ABORT_STREAK:
+                rec["metrics_quality"] = "estimated"
+                kept.append(rec)
+                continue
+            nav_total += 1
+            series = fetch_real_nav(rec["code"], now)
+            time.sleep(NAV_THROTTLE)
+            m_real = calc_real_metrics(series) if series else None
+            if m_real is None:
+                nav_fail += 1
+                fail_streak += 1
+                rec["metrics_quality"] = "estimated"
+                kept.append(rec)
+                continue
+            fail_streak = 0
+            nav_ok += 1
+            mm = dict(m_real)
+            mm["rank_pct"] = rec["rank_pct"]
+            mm["scale"] = rec["scale"]
+            if any(not check_rule(mm, (k, c), th) for _d, k, c, th in rules["admission"]):
+                continue  # 真实指标不满足准入 → 剔除出池
+            rec["tier"] = ("core" if all(check_rule(mm, (k, c), th)
+                                          for _d, k, c, th in rules["preferred"]) else "observe")
+            rec["metrics"] = m_real
+            rec["score"] = score_of(m_real, rec["rank_pct"])
+            rec["metrics_quality"] = "real"
+            kept.append(rec)
+
+        lst = kept
+        lst.sort(key=lambda x: (x["tier"] != "core", -x["score"]))
         core = [x for x in lst if x["tier"] == "core"][:MAX_CORE]
         observe = [x for x in lst if x["tier"] == "observe"][:MAX_OBSERVE]
         total_core += len(core)
@@ -552,6 +678,7 @@ def build():
             del rec["_type_count"]
 
         all_m = [x["metrics"] for x in core + observe]
+        n_real = sum(1 for x in core + observe if x.get("metrics_quality") == "real")
         pools[pid] = {
             **POOL_DEFS[pid],
             "rules": rules,
@@ -560,6 +687,8 @@ def build():
                 "admission_pass": stats_admit[pid],
                 "core_count": len(core),
                 "observe_count": len(observe),
+                "real_metrics_count": n_real,
+                "estimated_metrics_count": len(core) + len(observe) - n_real,
                 "avg_ann3": round(sum(x["ann3"] for x in all_m) / len(all_m), 2) if all_m else None,
                 "avg_mdd3": round(sum(x["mdd3"] for x in all_m) / len(all_m), 2) if all_m else None,
                 "avg_sharpe": round(sum(x["sharpe"] for x in all_m) / len(all_m), 2) if all_m else None,
@@ -567,8 +696,11 @@ def build():
             "core": core,
             "observe": observe,
         }
-        print("  %-6s 准入 %4d → 核心 %2d + 观察 %2d" % (
-            POOL_DEFS[pid]["name"], stats_admit[pid], len(core), len(observe)))
+        print("  %-6s 准入 %4d → 核心 %2d + 观察 %2d（真实指标 %d/%d）" % (
+            POOL_DEFS[pid]["name"], stats_admit[pid], len(core), len(observe),
+            n_real, len(core) + len(observe)))
+
+    print("  真实净值拉取：%d/%d 成功，%d 回退估算" % (nav_ok, nav_total, nav_fail))
 
     payload = {
         "generated_at": now.strftime("%Y-%m-%d %H:%M:%S"),
@@ -583,13 +715,17 @@ def build():
         ],
         "pools": pools,
         "meta": {
-            "risk_metrics_method": "东财列表接口不含回撤/波动率/夏普，以上指标基于区间收益锚点插值出的近似净值序列估算，仅作原型演示口径",
+            "risk_metrics_method": (
+                "回撤/波动率/夏普/卡玛：基于近3年日频复权净值真实计算"
+                "（东财 pingzhongdata，equityReturn 分红再投口径）；"
+                "净值拉取失败的少数基金回退为区间收益锚点估算（标注 metrics_quality=estimated）。"
+                "收益、规模、同类排名、费率均为真实数据。"
+            ),
             "skipped_rules": [
                 "基金经理任职年限与风格漂移检查（无数据源）",
                 "合规记录 / 异常估值 / 流动性事件（无数据源）",
                 "前十大重仓股集中度、单一行业占比、信息比率、Alpha（需持仓数据）",
                 "高等级信用债占比、可转债占比、FOF 底层基金数量与自家配置占比（需定期报告）",
-                "滚动持有一年正收益概率（需日频净值）",
             ],
             "pool_scope": "指数型、货币型、QDII、REITs、商品型及发起式/持有期/定开产品暂不入池",
         },

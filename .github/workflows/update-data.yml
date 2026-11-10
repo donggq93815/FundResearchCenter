@@ -6,6 +6,12 @@ on:
     - cron: "30 12 * * 1-5"
   # 支持手动触发
   workflow_dispatch:
+  # 数据管道代码变更后自动运行一次（github-actions bot 的提交不会再次触发）
+  push:
+    branches: [main]
+    paths:
+      - "data_service/**"
+      - ".github/workflows/update-data.yml"
 
 permissions:
   contents: write
