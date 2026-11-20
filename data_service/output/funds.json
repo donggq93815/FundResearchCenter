@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-11-19 20:54:51",
+  "generated_at": "2026-11-20 20:39:45",
   "funds": [
     {
       "code": "519300",
       "name": "大成沪深300指数",
-      "nav": 0.9881,
-      "acc_nav": 2.9197,
-      "nav_date": "2026-11-19",
-      "pct": 0.03,
+      "nav": 0.9809,
+      "acc_nav": 2.9125,
+      "nav_date": "2026-11-20",
+      "pct": -0.73,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -22,27 +22,27 @@
       "sources": [
         {
           "name": "东方财富",
-          "nav": 0.9881,
-          "acc_nav": 2.9197,
-          "nav_date": "2026-11-19",
-          "pct": 0.03,
+          "nav": 0.9809,
+          "acc_nav": 2.9125,
+          "nav_date": "2026-11-20",
+          "pct": -0.73,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 0.9881,
+          "nav": 0.9809,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.03,
+          "nav_date": "2026-11-20",
+          "pct": -0.73,
           "status": "ok",
           "scale": 10.15
         },
         {
           "name": "蛋卷",
-          "nav": 0.9881,
+          "nav": 0.9809,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.03,
+          "nav_date": "2026-11-20",
+          "pct": -0.73,
           "status": "ok",
           "scale": 9.94
         }
@@ -51,37 +51,37 @@
     {
       "code": "011234",
       "name": "宏利中债1-5年国开债指数A",
-      "nav": 1.0657,
-      "acc_nav": 1.1537,
-      "nav_date": "2026-11-19",
-      "pct": 0.61,
+      "nav": 1.066,
+      "acc_nav": 1.154,
+      "nav_date": "2026-11-20",
+      "pct": 0.03,
       "adopted_source": "东方财富",
       "conflict": false,
       "conflicts": [],
       "sources": [
         {
           "name": "东方财富",
-          "nav": 1.0657,
-          "acc_nav": 1.1537,
-          "nav_date": "2026-11-19",
-          "pct": 0.61,
+          "nav": 1.066,
+          "acc_nav": 1.154,
+          "nav_date": "2026-11-20",
+          "pct": 0.03,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 1.0657,
+          "nav": 1.066,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.61,
+          "nav_date": "2026-11-20",
+          "pct": 0.03,
           "status": "ok",
           "scale": 0.015141
         },
         {
           "name": "蛋卷",
-          "nav": 1.0657,
+          "nav": 1.066,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.61,
+          "nav_date": "2026-11-20",
+          "pct": 0.03,
           "status": "ok"
         }
       ]
@@ -89,37 +89,37 @@
     {
       "code": "000083",
       "name": "汇添富消费行业混合",
-      "nav": 4.526,
-      "acc_nav": 4.526,
-      "nav_date": "2026-11-19",
-      "pct": 0.33,
+      "nav": 4.487,
+      "acc_nav": 4.487,
+      "nav_date": "2026-11-20",
+      "pct": -0.86,
       "adopted_source": "东方财富",
       "conflict": false,
       "conflicts": [],
       "sources": [
         {
           "name": "东方财富",
-          "nav": 4.526,
-          "acc_nav": 4.526,
-          "nav_date": "2026-11-19",
-          "pct": 0.33,
+          "nav": 4.487,
+          "acc_nav": 4.487,
+          "nav_date": "2026-11-20",
+          "pct": -0.86,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 4.526,
+          "nav": 4.487,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.33,
+          "nav_date": "2026-11-20",
+          "pct": -0.86,
           "status": "ok",
           "scale": 61.27
         },
         {
           "name": "蛋卷",
-          "nav": 4.526,
+          "nav": 4.487,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.33,
+          "nav_date": "2026-11-20",
+          "pct": -0.86,
           "status": "ok",
           "scale": 61.27
         }
@@ -128,10 +128,10 @@
     {
       "code": "005267",
       "name": "嘉实价值精选股票A",
-      "nav": 2.0533,
-      "acc_nav": 2.0533,
-      "nav_date": "2026-11-19",
-      "pct": -0.09,
+      "nav": 2.0322,
+      "acc_nav": 2.0322,
+      "nav_date": "2026-11-20",
+      "pct": -1.03,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -146,27 +146,27 @@
       "sources": [
         {
           "name": "东方财富",
-          "nav": 2.0533,
-          "acc_nav": 2.0533,
-          "nav_date": "2026-11-19",
-          "pct": -0.09,
+          "nav": 2.0322,
+          "acc_nav": 2.0322,
+          "nav_date": "2026-11-20",
+          "pct": -1.03,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 2.0533,
+          "nav": 2.0322,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.09,
+          "nav_date": "2026-11-20",
+          "pct": -1.03,
           "status": "ok",
           "scale": 22.89
         },
         {
           "name": "蛋卷",
-          "nav": 2.0533,
+          "nav": 2.0322,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.09,
+          "nav_date": "2026-11-20",
+          "pct": -1.03,
           "status": "ok",
           "scale": 21.9
         }
@@ -175,37 +175,37 @@
     {
       "code": "007890",
       "name": "银河聚星两年定开债券",
-      "nav": 1.0507,
-      "acc_nav": 1.1619,
-      "nav_date": "2026-11-13",
-      "pct": 0.07,
+      "nav": 1.0509,
+      "acc_nav": 1.1621,
+      "nav_date": "2026-11-20",
+      "pct": 0.02,
       "adopted_source": "东方财富",
       "conflict": false,
       "conflicts": [],
       "sources": [
         {
           "name": "东方财富",
-          "nav": 1.0507,
-          "acc_nav": 1.1619,
-          "nav_date": "2026-11-13",
+          "nav": 1.0509,
+          "acc_nav": 1.1621,
+          "nav_date": "2026-11-20",
           "pct": null,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 1.0507,
+          "nav": 1.0509,
           "acc_nav": null,
-          "nav_date": "2026-11-13",
-          "pct": 0.07,
+          "nav_date": "2026-11-20",
+          "pct": 0.02,
           "status": "ok",
           "scale": 80.38
         },
         {
           "name": "蛋卷",
-          "nav": 1.0507,
+          "nav": 1.0509,
           "acc_nav": null,
-          "nav_date": "2026-11-13",
-          "pct": 0.07,
+          "nav_date": "2026-11-20",
+          "pct": 0.02,
           "status": "ok",
           "scale": 80.38
         }
@@ -214,10 +214,10 @@
     {
       "code": "001717",
       "name": "工银前沿医疗股票",
-      "nav": 2.857,
-      "acc_nav": 2.857,
-      "nav_date": "2026-11-19",
-      "pct": -0.56,
+      "nav": 2.774,
+      "acc_nav": 2.774,
+      "nav_date": "2026-11-20",
+      "pct": -2.91,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -232,27 +232,27 @@
       "sources": [
         {
           "name": "东方财富",
-          "nav": 2.857,
-          "acc_nav": 2.857,
-          "nav_date": "2026-11-19",
-          "pct": -0.56,
+          "nav": 2.774,
+          "acc_nav": 2.774,
+          "nav_date": "2026-11-20",
+          "pct": -2.91,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 2.857,
+          "nav": 2.774,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.56,
+          "nav_date": "2026-11-20",
+          "pct": -2.91,
           "status": "ok",
           "scale": 87.74
         },
         {
           "name": "蛋卷",
-          "nav": 2.857,
+          "nav": 2.774,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.56,
+          "nav_date": "2026-11-20",
+          "pct": -2.91,
           "status": "ok",
           "scale": 72.87
         }
@@ -261,37 +261,37 @@
     {
       "code": "005827",
       "name": "易方达蓝筹精选混合",
-      "nav": 1.3516,
-      "acc_nav": 1.3516,
-      "nav_date": "2026-11-19",
-      "pct": -0.46,
+      "nav": 1.3391,
+      "acc_nav": 1.3391,
+      "nav_date": "2026-11-20",
+      "pct": -0.92,
       "adopted_source": "东方财富",
       "conflict": false,
       "conflicts": [],
       "sources": [
         {
           "name": "东方财富",
-          "nav": 1.3516,
-          "acc_nav": 1.3516,
-          "nav_date": "2026-11-19",
-          "pct": -0.46,
+          "nav": 1.3391,
+          "acc_nav": 1.3391,
+          "nav_date": "2026-11-20",
+          "pct": -0.92,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 1.3516,
+          "nav": 1.3391,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.46,
+          "nav_date": "2026-11-20",
+          "pct": -0.92,
           "status": "ok",
           "scale": 189.33
         },
         {
           "name": "蛋卷",
-          "nav": 1.3516,
+          "nav": 1.3391,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.46,
+          "nav_date": "2026-11-20",
+          "pct": -0.92,
           "status": "ok",
           "scale": 189.33
         }
@@ -300,10 +300,10 @@
     {
       "code": "004231",
       "name": "中欧行业成长混合（LOF）C",
-      "nav": 1.9941,
-      "acc_nav": 2.1921,
-      "nav_date": "2026-11-19",
-      "pct": -0.38,
+      "nav": 1.9725,
+      "acc_nav": 2.1705,
+      "nav_date": "2026-11-20",
+      "pct": -1.08,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -318,27 +318,27 @@
       "sources": [
         {
           "name": "东方财富",
-          "nav": 1.9941,
-          "acc_nav": 2.1921,
-          "nav_date": "2026-11-19",
-          "pct": -0.38,
+          "nav": 1.9725,
+          "acc_nav": 2.1705,
+          "nav_date": "2026-11-20",
+          "pct": -1.08,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 1.9941,
+          "nav": 1.9725,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.38,
+          "nav_date": "2026-11-20",
+          "pct": -1.08,
           "status": "ok",
           "scale": 17.42
         },
         {
           "name": "蛋卷",
-          "nav": 1.9941,
+          "nav": 1.9725,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.38,
+          "nav_date": "2026-11-20",
+          "pct": -1.08,
           "status": "ok",
           "scale": 3.9
         }
@@ -347,10 +347,10 @@
     {
       "code": "217022",
       "name": "招商产业债券",
-      "nav": 1.8691,
-      "acc_nav": 2.1091,
-      "nav_date": "2026-11-19",
-      "pct": 0.03,
+      "nav": 1.8694,
+      "acc_nav": 2.1094,
+      "nav_date": "2026-11-20",
+      "pct": 0.02,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -365,27 +365,27 @@
       "sources": [
         {
           "name": "东方财富",
-          "nav": 1.8691,
-          "acc_nav": 2.1091,
-          "nav_date": "2026-11-19",
-          "pct": 0.03,
+          "nav": 1.8694,
+          "acc_nav": 2.1094,
+          "nav_date": "2026-11-20",
+          "pct": 0.02,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 1.8691,
+          "nav": 1.8694,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.03,
+          "nav_date": "2026-11-20",
+          "pct": 0.02,
           "status": "ok",
           "scale": 129.39
         },
         {
           "name": "蛋卷",
-          "nav": 1.8691,
+          "nav": 1.8694,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.03,
+          "nav_date": "2026-11-20",
+          "pct": 0.02,
           "status": "ok",
           "scale": 123.3
         }
@@ -394,10 +394,10 @@
     {
       "code": "110008",
       "name": "易方达稳健收益债B",
-      "nav": 1.4153,
-      "acc_nav": 2.6429,
-      "nav_date": "2026-11-19",
-      "pct": -0.01,
+      "nav": 1.4122,
+      "acc_nav": 2.6398,
+      "nav_date": "2026-11-20",
+      "pct": -0.22,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -412,27 +412,27 @@
       "sources": [
         {
           "name": "东方财富",
-          "nav": 1.4153,
-          "acc_nav": 2.6429,
-          "nav_date": "2026-11-19",
-          "pct": -0.01,
+          "nav": 1.4122,
+          "acc_nav": 2.6398,
+          "nav_date": "2026-11-20",
+          "pct": -0.22,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 1.4153,
+          "nav": 1.4122,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.01,
+          "nav_date": "2026-11-20",
+          "pct": -0.22,
           "status": "ok",
           "scale": 311.03
         },
         {
           "name": "蛋卷",
-          "nav": 1.4153,
+          "nav": 1.4122,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -0.01,
+          "nav_date": "2026-11-20",
+          "pct": -0.22,
           "status": "ok",
           "scale": 193.83
         }
@@ -443,8 +443,8 @@
       "name": "博时安盈债券A",
       "nav": 1.2615,
       "acc_nav": 1.4995,
-      "nav_date": "2026-11-19",
-      "pct": 0.01,
+      "nav_date": "2026-11-20",
+      "pct": 0.0,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -461,16 +461,16 @@
           "name": "东方财富",
           "nav": 1.2615,
           "acc_nav": 1.4995,
-          "nav_date": "2026-11-19",
-          "pct": 0.01,
+          "nav_date": "2026-11-20",
+          "pct": 0.0,
           "status": "ok"
         },
         {
           "name": "盈米",
           "nav": 1.2615,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.01,
+          "nav_date": "2026-11-20",
+          "pct": 0.0,
           "status": "ok",
           "scale": 27.83
         },
@@ -478,8 +478,8 @@
           "name": "蛋卷",
           "nav": 1.2615,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.01,
+          "nav_date": "2026-11-20",
+          "pct": 0.0,
           "status": "ok",
           "scale": 15.54
         }
@@ -488,10 +488,10 @@
     {
       "code": "519723",
       "name": "交银双轮动债券A",
-      "nav": 1.0631,
-      "acc_nav": 1.5521,
-      "nav_date": "2026-11-19",
-      "pct": 0.06,
+      "nav": 1.0633,
+      "acc_nav": 1.5523,
+      "nav_date": "2026-11-20",
+      "pct": 0.02,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -506,27 +506,27 @@
       "sources": [
         {
           "name": "东方财富",
-          "nav": 1.0631,
-          "acc_nav": 1.5521,
-          "nav_date": "2026-11-19",
-          "pct": 0.06,
+          "nav": 1.0633,
+          "acc_nav": 1.5523,
+          "nav_date": "2026-11-20",
+          "pct": 0.02,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 1.0631,
+          "nav": 1.0633,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.06,
+          "nav_date": "2026-11-20",
+          "pct": 0.02,
           "status": "ok",
           "scale": 7.91
         },
         {
           "name": "蛋卷",
-          "nav": 1.0631,
+          "nav": 1.0633,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": 0.06,
+          "nav_date": "2026-11-20",
+          "pct": 0.02,
           "status": "ok",
           "scale": 4.75
         }
@@ -535,9 +535,9 @@
     {
       "code": "000198",
       "name": "天弘余额宝",
-      "nav": 0.2163,
+      "nav": 0.2159,
       "acc_nav": 0.792,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "pct": 0.0,
       "adopted_source": "东方财富",
       "conflict": true,
@@ -545,18 +545,18 @@
         {
           "field": "nav",
           "values": {
-            "东方财富": 0.2163,
+            "东方财富": 0.2159,
             "盈米": 1.0,
-            "蛋卷": 0.2163
+            "蛋卷": 0.2159
           }
         }
       ],
       "sources": [
         {
           "name": "东方财富",
-          "nav": 0.2163,
+          "nav": 0.2159,
           "acc_nav": 0.792,
-          "nav_date": "2026-11-19",
+          "nav_date": "2026-11-20",
           "pct": 0.0,
           "status": "ok"
         },
@@ -564,16 +564,16 @@
           "name": "盈米",
           "nav": 1.0,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
+          "nav_date": "2026-11-20",
           "pct": 0.0,
           "status": "ok",
           "scale": 6451.36
         },
         {
           "name": "蛋卷",
-          "nav": 0.2163,
+          "nav": 0.2159,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
+          "nav_date": "2026-11-20",
           "pct": null,
           "status": "ok"
         }
@@ -582,10 +582,10 @@
     {
       "code": "000948",
       "name": "华夏沪港通恒生ETF联接",
-      "nav": 1.2714,
-      "acc_nav": 1.2714,
-      "nav_date": "2026-11-19",
-      "pct": -1.83,
+      "nav": 1.2497,
+      "acc_nav": 1.2497,
+      "nav_date": "2026-11-20",
+      "pct": -1.71,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -600,27 +600,27 @@
       "sources": [
         {
           "name": "东方财富",
-          "nav": 1.2714,
-          "acc_nav": 1.2714,
-          "nav_date": "2026-11-19",
-          "pct": -1.83,
+          "nav": 1.2497,
+          "acc_nav": 1.2497,
+          "nav_date": "2026-11-20",
+          "pct": -1.71,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 1.2714,
+          "nav": 1.2497,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -1.83,
+          "nav_date": "2026-11-20",
+          "pct": -1.71,
           "status": "ok",
           "scale": 13.29
         },
         {
           "name": "蛋卷",
-          "nav": 1.2714,
+          "nav": 1.2497,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -1.83,
+          "nav_date": "2026-11-20",
+          "pct": -1.71,
           "status": "ok",
           "scale": 7.98
         }
@@ -629,10 +629,10 @@
     {
       "code": "000217",
       "name": "华安黄金ETF联接C",
-      "nav": 2.6925,
-      "acc_nav": 2.6925,
-      "nav_date": "2026-11-19",
-      "pct": -1.14,
+      "nav": 2.5666,
+      "acc_nav": 2.5666,
+      "nav_date": "2026-11-20",
+      "pct": -4.68,
       "adopted_source": "东方财富",
       "conflict": true,
       "conflicts": [
@@ -647,27 +647,27 @@
       "sources": [
         {
           "name": "东方财富",
-          "nav": 2.6925,
-          "acc_nav": 2.6925,
-          "nav_date": "2026-11-19",
-          "pct": -1.14,
+          "nav": 2.5666,
+          "acc_nav": 2.5666,
+          "nav_date": "2026-11-20",
+          "pct": -4.68,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 2.6925,
+          "nav": 2.5666,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -1.14,
+          "nav_date": "2026-11-20",
+          "pct": -4.68,
           "status": "ok",
           "scale": 414.05
         },
         {
           "name": "蛋卷",
-          "nav": 2.6925,
+          "nav": 2.5666,
           "acc_nav": null,
-          "nav_date": "2026-11-19",
-          "pct": -1.14,
+          "nav_date": "2026-11-20",
+          "pct": -4.68,
           "status": "ok",
           "scale": 280.82
         }
@@ -676,37 +676,37 @@
     {
       "code": "006291",
       "name": "南方养老2035(FOF)C",
-      "nav": 1.5528,
-      "acc_nav": 1.5528,
-      "nav_date": "2026-11-17",
-      "pct": 0.02,
+      "nav": 1.5513,
+      "acc_nav": 1.5513,
+      "nav_date": "2026-11-18",
+      "pct": -0.1,
       "adopted_source": "东方财富",
       "conflict": false,
       "conflicts": [],
       "sources": [
         {
           "name": "东方财富",
-          "nav": 1.5528,
-          "acc_nav": 1.5528,
-          "nav_date": "2026-11-17",
-          "pct": 0.02,
+          "nav": 1.5513,
+          "acc_nav": 1.5513,
+          "nav_date": "2026-11-18",
+          "pct": -0.1,
           "status": "ok"
         },
         {
           "name": "盈米",
-          "nav": 1.5528,
+          "nav": 1.5513,
           "acc_nav": null,
-          "nav_date": "2026-11-17",
-          "pct": 0.02,
+          "nav_date": "2026-11-18",
+          "pct": -0.1,
           "status": "ok",
           "scale": 6.71
         },
         {
           "name": "蛋卷",
-          "nav": 1.5528,
+          "nav": 1.5513,
           "acc_nav": null,
-          "nav_date": "2026-11-17",
-          "pct": 0.02,
+          "nav_date": "2026-11-18",
+          "pct": -0.1,
           "status": "ok"
         }
       ]
@@ -778,85 +778,85 @@
       "source": "新浪财经",
       "code": "000001",
       "name": "上证指数",
-      "price": 3577.6174,
-      "change": -10.2143,
-      "pct": -0.28,
-      "volume": 4129127.0,
+      "price": 3533.7929,
+      "change": -43.8245,
+      "pct": -1.22,
+      "volume": 4997117.0,
       "is_close": true,
       "quote_time": "收盘",
-      "fetched_at": "2026-11-19 20:54:51"
+      "fetched_at": "2026-11-20 20:39:45"
     },
     {
       "source": "新浪财经",
       "code": "399001",
       "name": "深证成指",
-      "price": 10583.2,
-      "change": -76.207,
-      "pct": -0.71,
-      "volume": 491464196.0,
+      "price": 10256.39,
+      "change": -326.815,
+      "pct": -3.09,
+      "volume": 571808607.0,
       "is_close": true,
       "quote_time": "收盘",
-      "fetched_at": "2026-11-19 20:54:51"
+      "fetched_at": "2026-11-20 20:39:45"
     },
     {
       "source": "新浪财经",
       "code": "399006",
       "name": "创业板指",
-      "price": 2293.34,
-      "change": -18.279,
-      "pct": -0.79,
-      "volume": 22708071.0,
+      "price": 2212.13,
+      "change": -81.214,
+      "pct": -3.54,
+      "volume": 26673495.0,
       "is_close": true,
       "quote_time": "收盘",
-      "fetched_at": "2026-11-19 20:54:51"
+      "fetched_at": "2026-11-20 20:39:45"
     },
     {
       "source": "新浪财经",
       "code": "000300",
       "name": "沪深300",
-      "price": 3984.8399,
-      "change": 1.0732,
-      "pct": 0.03,
-      "volume": 1633577.0,
+      "price": 3954.565,
+      "change": -30.2749,
+      "pct": -0.76,
+      "volume": 2107449.0,
       "is_close": true,
       "quote_time": "收盘",
-      "fetched_at": "2026-11-19 20:54:51"
+      "fetched_at": "2026-11-20 20:39:45"
     },
     {
       "source": "新浪财经",
       "code": "000905",
       "name": "中证500",
-      "price": 6251.9578,
-      "change": -30.2582,
-      "pct": -0.48,
-      "volume": 1135078.0,
+      "price": 6006.0797,
+      "change": -245.8781,
+      "pct": -3.93,
+      "volume": 1348116.0,
       "is_close": true,
       "quote_time": "收盘",
-      "fetched_at": "2026-11-19 20:54:51"
+      "fetched_at": "2026-11-20 20:39:45"
     },
     {
       "source": "新浪财经",
       "code": "000016",
       "name": "上证50",
-      "price": 2773.4586,
-      "change": 8.9185,
-      "pct": 0.32,
-      "volume": 430543.0,
+      "price": 2785.9206,
+      "change": 12.462,
+      "pct": 0.45,
+      "volume": 623423.0,
       "is_close": true,
       "quote_time": "收盘",
-      "fetched_at": "2026-11-19 20:54:51"
+      "fetched_at": "2026-11-20 20:39:45"
     },
     {
       "source": "新浪财经",
       "code": "000688",
       "name": "科创50",
-      "price": 1270.7833,
-      "change": 22.7928,
-      "pct": 1.83,
-      "volume": 122723.0,
+      "price": 1231.089,
+      "change": -39.6943,
+      "pct": -3.12,
+      "volume": 102437.0,
       "is_close": true,
       "quote_time": "收盘",
-      "fetched_at": "2026-11-19 20:54:51"
+      "fetched_at": "2026-11-20 20:39:45"
     }
   ],
   "meta": {
